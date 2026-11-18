@@ -396,7 +396,7 @@ export default function App() {
       </header>
 
       {/* 2. Hero Section (Brand Identity, Greeting, & Hero Placeholder) */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-[#FAF2E8] via-[#FFFDF9] to-[#FFFDF9] py-14 sm:py-20 border-b border-[#F5EBE1]">
+      <section className="relative overflow-hidden bg-gradient-to-b from-[#F7ECD8] via-[#FFFDF8] via-70% to-[#1A1613]/[0.025] py-14 sm:py-20 border-b border-[#F5EBE1]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
             
@@ -498,7 +498,7 @@ export default function App() {
       </section>
 
       {/* 2. Brand Story & Founder Section */}
-      <section id="about" className="py-16 sm:py-20 bg-gradient-to-b from-[#FFFDF9] via-[#FAF3EA] to-[#FFFDF9] border-b border-[#F5EBE1]">
+      <section id="about" className="py-16 sm:py-20 bg-gradient-to-b from-[#FFFDF8] via-[#FBF2E3] via-60% to-[#1A1613]/[0.035] border-b border-[#F5EBE1]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
             
@@ -558,7 +558,7 @@ export default function App() {
       </section>
 
       {/* 3. Product Catalog (Menu & Gallery Section) */}
-      <section id="menu" className="py-16 sm:py-24 bg-gradient-to-b from-[#FFFDF9] via-[#FAF1E4] to-[#FAF5ED]">
+      <section id="menu" className="py-16 sm:py-24 bg-gradient-to-b from-[#FFFDF8] via-[#FAF0DA] via-65% to-[#1C1814]/[0.035]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
           {/* Header */}
@@ -686,7 +686,7 @@ export default function App() {
       </section>
 
       {/* 4. Interactive Features: Delivery Zone Checker & Custom Cake Inquiry Form */}
-      <section id="delivery-checker" className="py-16 sm:py-20 bg-gradient-to-b from-[#FAF5ED] via-[#F6EAD8] to-[#FFFDF9] border-y border-[#F5EBE1]">
+      <section id="delivery-checker" className="py-16 sm:py-20 bg-gradient-to-b from-[#FAF4EA] via-[#F4E6CD] via-60% to-[#181512]/[0.03] border-y border-[#F5EBE1]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
           <div className="text-center max-w-2xl mx-auto mb-12">
@@ -769,7 +769,7 @@ export default function App() {
       </section>
 
       {/* 4b. Custom Cake Inquiry Form (Interactive & Reactive) */}
-      <section id="inquiry-section" className="py-16 sm:py-24 bg-gradient-to-b from-[#FFFDF9] via-[#FAF3EA] to-[#FAF2E8]">
+      <section id="inquiry-section" className="py-16 sm:py-24 bg-gradient-to-b from-[#FFFDF8] via-[#FAF2E1] via-60% to-[#1C1814]/[0.035]">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           
           <div className="text-center mb-12">
@@ -1053,7 +1053,7 @@ export default function App() {
       </section>
 
       {/* 5. Storefront Location & Contact (Contact Section & Footer) */}
-      <section id="location" className="py-16 sm:py-20 bg-gradient-to-b from-[#FAF2E8] via-[#F4E6D4] to-[#FAF2E8] border-t border-[#F5EBE1]">
+      <section id="location" className="py-16 sm:py-20 bg-gradient-to-b from-[#FAF4EA] via-[#F3E5CE] via-60% to-[#181512]/[0.03] border-t border-[#F5EBE1]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
