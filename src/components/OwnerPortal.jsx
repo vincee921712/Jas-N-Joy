@@ -191,50 +191,52 @@ export default function OwnerPortal({
     ? products
     : products.filter(p => p.category === portalCategoryFilter);
 
-  // If Not Authenticated, show Login Screen
+  // If Not Authenticated, show Login Screen matching the clean guide sample card
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-[#FFFDF9] flex flex-col justify-center items-center px-4 py-12 selection:bg-amber-200 selection:text-amber-900">
+      <div className="min-h-screen bg-[#F8F6F2] flex flex-col justify-center items-center px-4 py-12 selection:bg-amber-200 selection:text-amber-900">
         
-        {/* Back Button */}
-        <div className="w-full max-w-md mb-6">
+        {/* Back Link */}
+        <div className="w-full max-w-[430px] mb-5">
           <button
             onClick={onBackToStorefront}
-            className="inline-flex items-center gap-2 text-xs font-semibold text-[#78350F] hover:text-[#451A03] transition-colors"
+            className="inline-flex items-center gap-2 text-xs font-semibold text-[#8C6D53] hover:text-[#451A03] transition-colors"
           >
             <Store className="w-4 h-4" />
-            <span>← Return to Public Storefront</span>
+            <span>← Return to Storefront</span>
           </button>
         </div>
 
-        {/* Login Box */}
-        <div className="w-full max-w-md bg-white rounded-3xl border border-[#E9D9C9] p-8 sm:p-10 shadow-lg relative">
+        {/* Login Card (Styled after the exact guide sample) */}
+        <div className="w-full max-w-[430px] bg-white rounded-[32px] p-8 sm:p-10 shadow-[0_10px_35px_-8px_rgba(0,0,0,0.07)] border border-stone-100/80 relative">
           
-          <div className="text-center mb-8">
-            <div className="w-16 h-16 rounded-2xl bg-[#FAF2E8] border border-[#E9D9C9] flex items-center justify-center mx-auto mb-4 text-[#92400E] shadow-2xs">
-              <Lock className="w-7 h-7" />
+          {/* Centered Shield Badge */}
+          <div className="flex justify-center mb-6">
+            <div className="w-16 h-16 rounded-[22px] bg-[#FBF0E4] flex items-center justify-center text-[#C25E2E] shadow-xs">
+              <ShieldCheck className="w-7 h-7 stroke-[2.2]" />
             </div>
-            <span className="text-[11px] font-bold uppercase tracking-wider text-[#92400E] bg-[#FEF3C7] px-3 py-1 rounded-full border border-[#FDE68A]">
-              Owner & Baker Administration
-            </span>
-            <h1 className="font-serif text-2xl sm:text-3xl font-bold text-[#451A03] mt-3">
-              Owner Portal Login
+          </div>
+
+          {/* Heading and Description */}
+          <div className="text-center mb-8 space-y-2">
+            <h1 className="font-serif text-[26px] sm:text-[28px] font-bold text-[#143240] tracking-tight">
+              Staff Portal Secure Login
             </h1>
-            <p className="text-xs text-[#786C62] mt-1.5">
-              Secure catalog and custom slot management for <strong>{bakeryInfo.owner}</strong>.
+            <p className="text-[13px] text-[#556973] leading-relaxed max-w-xs mx-auto">
+              This terminal is reserved for Jas 'N Joy managers and kitchen staff. Please log in below.
             </p>
           </div>
 
           {loginError && (
-            <div className="mb-6 p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-start gap-2.5">
+            <div className="mb-5 p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-start gap-2.5">
               <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5 text-rose-600" />
               <span>{loginError}</span>
             </div>
           )}
 
-          <form onSubmit={handleLogin} className="space-y-4">
+          <form onSubmit={handleLogin} className="space-y-5">
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-[#57483D] mb-1.5">
+              <label className="block text-[13px] font-bold text-[#1F384C] mb-1.5">
                 Username
               </label>
               <input 
@@ -243,44 +245,47 @@ export default function OwnerPortal({
                 value={loginForm.username}
                 onChange={(e) => setLoginForm({ ...loginForm, username: e.target.value })}
                 placeholder="admin"
-                className="w-full px-4 py-3 rounded-xl border border-[#D9C4B2] bg-[#FFFDF9] text-sm text-[#451A03] focus:outline-none focus:ring-2 focus:ring-[#92400E]/20 focus:border-[#92400E]"
+                className="w-full px-4 py-3 rounded-2xl border border-[#DECDBB] bg-white text-sm text-[#1F384C] placeholder:text-[#A89D91] focus:outline-none focus:ring-2 focus:ring-[#C25E2E]/25 focus:border-[#C25E2E] transition-all"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-[#57483D] mb-1.5">
+              <label className="block text-[13px] font-bold text-[#1F384C] mb-1.5">
                 Password
               </label>
-              <input 
-                type="password"
-                required
-                value={loginForm.password}
-                onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })}
-                placeholder="••••••••"
-                className="w-full px-4 py-3 rounded-xl border border-[#D9C4B2] bg-[#FFFDF9] text-sm text-[#451A03] focus:outline-none focus:ring-2 focus:ring-[#92400E]/20 focus:border-[#92400E]"
-              />
+              <div className="relative">
+                <input 
+                  type="password"
+                  required
+                  value={loginForm.password}
+                  onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })}
+                  placeholder="••••••••"
+                  className="w-full px-4 py-3 rounded-2xl border border-[#DECDBB] bg-white text-sm text-[#1F384C] placeholder:text-[#A89D91] focus:outline-none focus:ring-2 focus:ring-[#C25E2E]/25 focus:border-[#C25E2E] transition-all pr-11"
+                />
+                <div className="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none text-[#5CB1C6]">
+                  <Lock className="w-4 h-4 stroke-[2]" />
+                </div>
+              </div>
             </div>
 
-            {/* Prototype Credentials helper note */}
-            <div className="p-3.5 rounded-xl bg-[#FAF2E8] border border-[#E9D9C9] text-[11px] text-[#78350F] flex items-center justify-between">
-              <span>Prototype Testing Login:</span>
-              <code className="font-mono bg-white px-2 py-0.5 rounded border border-[#D9C4B2] text-[#451A03] font-bold">
-                admin / admin
-              </code>
+            {/* Terracotta / Rust Button from the guide image */}
+            <div className="pt-2">
+              <button
+                type="submit"
+                className="w-full py-3.5 rounded-2xl bg-[#C85D2A] hover:bg-[#B45122] active:scale-[0.99] text-white font-bold text-[15px] shadow-[0_4px_14px_rgba(200,93,42,0.35)] hover:shadow-md transition-all flex items-center justify-center cursor-pointer"
+              >
+                <span>Sign In to Dashboard</span>
+              </button>
             </div>
 
-            <button
-              type="submit"
-              className="w-full py-3.5 rounded-2xl bg-[#92400E] hover:bg-[#78350F] text-white font-bold text-sm shadow-xs hover:shadow transition-all flex items-center justify-center gap-2 mt-2"
-            >
-              <Lock className="w-4 h-4 text-amber-200" />
-              <span>Sign In to Owner Portal</span>
-            </button>
+            {/* Default credentials note matching image style */}
+            <div className="text-center pt-3">
+              <span className="text-[12px] text-[#2C8598] font-medium">
+                Default credentials: <strong className="font-bold text-[#1F6E80]">admin</strong> / <strong className="font-bold text-[#1F6E80]">admin</strong>
+              </span>
+            </div>
           </form>
 
-          <div className="mt-8 pt-6 border-t border-[#F5EBE1] text-center text-[11px] text-[#786C62]">
-            DTI & BIR Registered • Jas 'N Joy Cakes and Pastries • Pueblo de Panay
-          </div>
         </div>
 
       </div>
