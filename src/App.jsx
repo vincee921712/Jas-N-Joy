@@ -261,12 +261,37 @@ export default function App() {
           </div>
 
           {/* Desktop Nav Links */}
-          <nav className="hidden lg:flex items-center gap-8 font-medium text-sm text-[#57483D]">
-            <a href="#about" className="hover:text-[#92400E] transition-colors">Our Story</a>
-            <a href="#menu" className="hover:text-[#92400E] transition-colors">Menu Catalog</a>
-            <a href="#delivery-checker" className="hover:text-[#92400E] transition-colors">Delivery Zones</a>
-            <a href="#inquiry-section" className="hover:text-[#92400E] transition-colors">Custom Cake Form</a>
-            <a href="#location" className="hover:text-[#92400E] transition-colors">Storefront Location</a>
+          <nav className="hidden lg:flex items-center gap-1.5 font-medium text-sm text-[#57483D]">
+            <a 
+              href="#about" 
+              className="px-3.5 py-2 rounded-full text-center hover:text-[#92400E] hover:bg-amber-100/70 hover:shadow-xs active:scale-95 transition-all duration-200"
+            >
+              Our Story
+            </a>
+            <a 
+              href="#menu" 
+              className="px-3.5 py-2 rounded-full text-center hover:text-[#92400E] hover:bg-amber-100/70 hover:shadow-xs active:scale-95 transition-all duration-200"
+            >
+              Menu Catalog
+            </a>
+            <a 
+              href="#delivery-checker" 
+              className="px-3.5 py-2 rounded-full text-center hover:text-[#92400E] hover:bg-amber-100/70 hover:shadow-xs active:scale-95 transition-all duration-200"
+            >
+              Delivery Zones
+            </a>
+            <a 
+              href="#inquiry-section" 
+              className="px-3.5 py-2 rounded-full text-center hover:text-[#92400E] hover:bg-amber-100/70 hover:shadow-xs active:scale-95 transition-all duration-200"
+            >
+              Custom Cake Form
+            </a>
+            <a 
+              href="#location" 
+              className="px-3.5 py-2 rounded-full text-center hover:text-[#92400E] hover:bg-amber-100/70 hover:shadow-xs active:scale-95 transition-all duration-200"
+            >
+              Storefront Location
+            </a>
           </nav>
 
           {/* CTA & Messenger Button */}
@@ -312,35 +337,35 @@ export default function App() {
             <a 
               href="#about" 
               onClick={() => setIsMobileMenuOpen(false)}
-              className="block font-medium text-sm text-[#451A03] hover:text-[#92400E]"
+              className="block px-3 py-2.5 rounded-xl font-medium text-sm text-[#451A03] hover:text-[#92400E] hover:bg-amber-100/70 transition-all"
             >
               Our Story
             </a>
             <a 
               href="#menu" 
               onClick={() => setIsMobileMenuOpen(false)}
-              className="block font-medium text-sm text-[#451A03] hover:text-[#92400E]"
+              className="block px-3 py-2.5 rounded-xl font-medium text-sm text-[#451A03] hover:text-[#92400E] hover:bg-amber-100/70 transition-all"
             >
               Menu Catalog
             </a>
             <a 
               href="#delivery-checker" 
               onClick={() => setIsMobileMenuOpen(false)}
-              className="block font-medium text-sm text-[#451A03] hover:text-[#92400E]"
+              className="block px-3 py-2.5 rounded-xl font-medium text-sm text-[#451A03] hover:text-[#92400E] hover:bg-amber-100/70 transition-all"
             >
               Roxas City Delivery Zones
             </a>
             <a 
               href="#inquiry-section" 
               onClick={() => setIsMobileMenuOpen(false)}
-              className="block font-medium text-sm text-[#451A03] hover:text-[#92400E]"
+              className="block px-3 py-2.5 rounded-xl font-medium text-sm text-[#451A03] hover:text-[#92400E] hover:bg-amber-100/70 transition-all"
             >
               Custom Cake Inquiry Form
             </a>
             <a 
               href="#location" 
               onClick={() => setIsMobileMenuOpen(false)}
-              className="block font-medium text-sm text-[#451A03] hover:text-[#92400E]"
+              className="block px-3 py-2.5 rounded-xl font-medium text-sm text-[#451A03] hover:text-[#92400E] hover:bg-amber-100/70 transition-all"
             >
               Storefront Location
             </a>
@@ -473,7 +498,7 @@ export default function App() {
       </section>
 
       {/* 2. Brand Story & Founder Section */}
-      <section id="about" className="py-16 sm:py-20 bg-white border-b border-[#F5EBE1]">
+      <section id="about" className="py-16 sm:py-20 bg-gradient-to-b from-[#FFFDF9] via-[#FAF3EA] to-[#FFFDF9] border-b border-[#F5EBE1]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
             
@@ -533,7 +558,7 @@ export default function App() {
       </section>
 
       {/* 3. Product Catalog (Menu & Gallery Section) */}
-      <section id="menu" className="py-16 sm:py-24 bg-[#FFFDF9]">
+      <section id="menu" className="py-16 sm:py-24 bg-gradient-to-b from-[#FFFDF9] via-[#FAF1E4] to-[#FAF5ED]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
           {/* Header */}
@@ -661,7 +686,7 @@ export default function App() {
       </section>
 
       {/* 4. Interactive Features: Delivery Zone Checker & Custom Cake Inquiry Form */}
-      <section id="delivery-checker" className="py-16 sm:py-20 bg-[#FAF2E8] border-y border-[#F5EBE1]">
+      <section id="delivery-checker" className="py-16 sm:py-20 bg-gradient-to-b from-[#FAF5ED] via-[#F6EAD8] to-[#FFFDF9] border-y border-[#F5EBE1]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
           <div className="text-center max-w-2xl mx-auto mb-12">
@@ -744,7 +769,7 @@ export default function App() {
       </section>
 
       {/* 4b. Custom Cake Inquiry Form (Interactive & Reactive) */}
-      <section id="inquiry-section" className="py-16 sm:py-24 bg-[#FFFDF9]">
+      <section id="inquiry-section" className="py-16 sm:py-24 bg-gradient-to-b from-[#FFFDF9] via-[#FAF3EA] to-[#FAF2E8]">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           
           <div className="text-center mb-12">
@@ -1028,7 +1053,7 @@ export default function App() {
       </section>
 
       {/* 5. Storefront Location & Contact (Contact Section & Footer) */}
-      <section id="location" className="py-16 sm:py-20 bg-[#FAF2E8] border-t border-[#F5EBE1]">
+      <section id="location" className="py-16 sm:py-20 bg-gradient-to-b from-[#FAF2E8] via-[#F4E6D4] to-[#FAF2E8] border-t border-[#F5EBE1]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
@@ -1127,7 +1152,7 @@ export default function App() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-[#451A03] text-[#FAF2E8]/80 pt-12 pb-24 md:pb-12 text-xs border-t border-amber-950">
+      <footer className="bg-gradient-to-b from-[#451A03] via-[#3B1502] to-[#2B0E01] text-[#FAF2E8]/80 pt-12 pb-24 md:pb-12 text-xs border-t border-amber-950">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
           
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 pb-8 border-b border-amber-900/60">
