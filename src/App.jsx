@@ -262,7 +262,7 @@ export default function App() {
 
           {/* Desktop Nav Links */}
           <nav className="hidden lg:flex items-center gap-8 font-medium text-sm text-[#57483D]">
-            <a href="#about" className="hover:text-[#92400E] transition-colors">Our Story & Founder</a>
+            <a href="#about" className="hover:text-[#92400E] transition-colors">Our Story</a>
             <a href="#menu" className="hover:text-[#92400E] transition-colors">Menu Catalog</a>
             <a href="#delivery-checker" className="hover:text-[#92400E] transition-colors">Delivery Zones</a>
             <a href="#inquiry-section" className="hover:text-[#92400E] transition-colors">Custom Cake Form</a>
@@ -314,7 +314,7 @@ export default function App() {
               onClick={() => setIsMobileMenuOpen(false)}
               className="block font-medium text-sm text-[#451A03] hover:text-[#92400E]"
             >
-              Our Story & Founder
+              Our Story
             </a>
             <a 
               href="#menu" 
@@ -402,7 +402,7 @@ export default function App() {
 
               {/* Bio Summary */}
               <p className="text-[#57483D] text-sm sm:text-base leading-relaxed max-w-2xl">
-                Founded by <strong>{bakeryInfo.owner}</strong> in 2019, Jas 'N Joy grew from an online home-based bakeshop in July 2020 into a beloved physical storefront at Pueblo de Panay. We take immense pride in handcrafting customized celebration centerpieces and daily fresh pastries for our community.
+                Established in 2019, Jas 'N Joy grew from an online home-based bakeshop in July 2020 into a beloved physical storefront at Pueblo de Panay. We take immense pride in handcrafting customized celebration centerpieces and daily fresh pastries for our community.
               </p>
 
               {/* Call to Actions */}
@@ -495,11 +495,10 @@ export default function App() {
                 <p className="font-medium text-[#78350F] italic">"{bakeryInfo.story.promise}"</p>
               </div>
 
-              {/* Founder Profile Card */}
+              {/* Business Official Contact Card */}
               <div className="pt-2 p-5 rounded-2xl bg-[#FFFDF9] border border-[#E9D9C9] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
-                  <span className="text-[11px] uppercase tracking-wider text-[#786C62] font-semibold">Owner & Founder</span>
-                  <h4 className="font-serif text-lg font-bold text-[#451A03]">{bakeryInfo.owner}</h4>
+                  <span className="text-[11px] uppercase tracking-wider text-[#786C62] font-semibold">Official Business Inquiries</span>
                   <p className="text-xs text-[#57483D] mt-0.5">{bakeryInfo.registration}</p>
                 </div>
                 <a 
@@ -757,7 +756,7 @@ export default function App() {
               Request a Custom Cake Quotation
             </h2>
             <p className="text-sm text-[#57483D] max-w-xl mx-auto">
-              Share your celebration vision with founder Razel C. Funa. Upload your photo inspiration, choose fulfillment, and get a tailored quotation.
+              Share your celebration vision with our baking team. Upload your photo inspiration, choose fulfillment, and get a tailored quotation.
             </p>
           </div>
 
@@ -1151,7 +1150,7 @@ export default function App() {
                 </span>
               </div>
               <p className="text-amber-300/80 text-xs mt-1">
-                "{bakeryInfo.tagline}" • Owned & Founded by {bakeryInfo.owner}
+                "{bakeryInfo.tagline}" • <a href={`mailto:${bakeryInfo.ownerEmail}`} className="hover:text-amber-100 underline decoration-amber-500/50">{bakeryInfo.ownerEmail}</a>
               </p>
             </div>
 
