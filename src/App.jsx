@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Heart, 
   Clock, 
@@ -22,20 +22,98 @@ import {
   ShieldCheck,
   Send,
   Store,
-  Compass
+  Compass,
+  Lock
 } from 'lucide-react';
 import { 
   bakeryInfo, 
   categories, 
-  products, 
+  products as defaultProducts, 
   roxasCityBarangays, 
   eventTypes 
 } from './data/bakeryData';
+import OwnerPortal from './components/OwnerPortal';
 
 export default function App() {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [bannerDismissed, setBannerDismissed] = useState(false);
+
+  // View state: 'storefront' | 'portal'
+  const [currentView, setCurrentView] = useState('storefront');
+
+  // LocalStorage Persisted State: Products Catalog
+  const [products, setProducts] = useState(() => {
+    try {
+      const saved = localStorage.getItem('jasnjoy_catalog_products');
+      if (saved) return JSON.parse(saved);
+    } catch (e) {
+      console.error("Failed to load products from localStorage", e);
+    }
+    return defaultProducts;
+  });
+
+  // LocalStorage Persisted State: Announcement Banner
+  const [announcement, setAnnouncement] = useState(() => {
+    try {
+      const saved = localStorage.getItem('jasnjoy_announcement');
+      if (saved) return JSON.parse(saved);
+    } catch (e) {
+      console.error("Failed to load announcement from localStorage", e);
+    }
+    return bakeryInfo.announcement;
+  });
+
+  // LocalStorage Persisted State: Custom Inquiries Log
+  const [inquiries, setInquiries] = useState(() => {
+    try {
+      const saved = localStorage.getItem('jasnjoy_inquiries_log');
+      if (saved) return JSON.parse(saved);
+    } catch (e) {
+      console.error("Failed to load inquiries from localStorage", e);
+    }
+    return [];
+  });
+
+  // Sync products to localStorage
+  const handleUpdateProducts = (newProducts) => {
+    setProducts(newProducts);
+    try {
+      localStorage.setItem('jasnjoy_catalog_products', JSON.stringify(newProducts));
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const handleResetProducts = () => {
+    if (window.confirm("Reset public catalog to the default bakeryData.js list?")) {
+      setProducts(defaultProducts);
+      try {
+        localStorage.removeItem('jasnjoy_catalog_products');
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  };
+
+  // Sync announcement banner to localStorage
+  const handleUpdateAnnouncement = (newAnnouncement) => {
+    setAnnouncement(newAnnouncement);
+    try {
+      localStorage.setItem('jasnjoy_announcement', JSON.stringify(newAnnouncement));
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const handleResetAnnouncement = () => {
+    setAnnouncement(bakeryInfo.announcement);
+    try {
+      localStorage.removeItem('jasnjoy_announcement');
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   // Delivery Zone Checker State
   const [selectedBarangay, setSelectedBarangay] = useState('Barangay Lawaan');
@@ -72,7 +150,7 @@ export default function App() {
 
   const handleFormSubmit = (e) => {
     e.preventDefault();
-    setSubmittedSummary({
+    const newInquiry = {
       ...formState,
       hasUploadedImage: !!previewImage,
       previewUrl: previewImage,
@@ -81,8 +159,35 @@ export default function App() {
         day: 'numeric', 
         year: 'numeric' 
       })
-    });
+    };
+
+    setSubmittedSummary(newInquiry);
+
+    // Save to inquiries state and localStorage for owner portal review
+    const updatedInquiries = [newInquiry, ...inquiries];
+    setInquiries(updatedInquiries);
+    try {
+      localStorage.setItem('jasnjoy_inquiries_log', JSON.stringify(updatedInquiries));
+    } catch (err) {
+      console.error(err);
+    }
   };
+
+  // If in Owner Portal view, render the Owner Portal component
+  if (currentView === 'portal') {
+    return (
+      <OwnerPortal
+        onBackToStorefront={() => setCurrentView('storefront')}
+        products={products}
+        onUpdateProducts={handleUpdateProducts}
+        onResetProducts={handleResetProducts}
+        announcement={announcement}
+        onUpdateAnnouncement={handleUpdateAnnouncement}
+        onResetAnnouncement={handleResetAnnouncement}
+        inquiries={inquiries}
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-[#FFFDF9] text-[#2D241E] font-sans selection:bg-amber-200 selection:text-amber-900">
@@ -95,12 +200,12 @@ export default function App() {
         >
           <div className="max-w-7xl mx-auto flex items-center justify-between gap-3">
             <div className="flex items-center gap-2 mx-auto sm:mx-0">
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-600/60 border border-amber-400/40 text-[11px] font-bold uppercase tracking-wider text-amber-100">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-600/60 border border-amber-400/40 text-[11px] font-bold uppercase tracking-wider text-amber-100 shrink-0">
                 <Sparkles className="w-3.5 h-3.5 text-amber-200" />
-                {bakeryInfo.announcement.badge}
+                {announcement.badge || "Slot Notice"}
               </span>
               <p className="text-center sm:text-left leading-tight">
-                {bakeryInfo.announcement.text}
+                {announcement.text}
               </p>
             </div>
             <button 
@@ -414,7 +519,7 @@ export default function App() {
               Cakes, Pastries & Everyday Delights
             </h2>
             <p className="text-sm sm:text-base text-[#57483D]">
-              Explore our ready-to-buy display treats, affordable snack tubs, and bespoke themed cakes. All products and prices are managed centrally in <code className="font-mono text-xs bg-[#F5EBE1] px-1.5 py-0.5 rounded text-[#78350F]">src/data/bakeryData.js</code>.
+              Explore our ready-to-buy display treats, affordable snack tubs, and bespoke themed cakes. Managed live with instant updates.
             </p>
           </div>
 
@@ -440,24 +545,46 @@ export default function App() {
             {filteredProducts.map((product) => (
               <div 
                 key={product.id}
-                className="bg-white rounded-3xl border border-[#E9D9C9] shadow-xs hover:shadow-md transition-all overflow-hidden flex flex-col"
+                className={`bg-white rounded-3xl border transition-all overflow-hidden flex flex-col justify-between ${
+                  product.isSoldOut ? 'border-stone-300 opacity-85' : 'border-[#E9D9C9] shadow-xs hover:shadow-md'
+                }`}
               >
-                {/* Product Photo Placeholder Frame */}
-                <div className="p-4 pb-0">
-                  <div className="relative aspect-4/3 w-full rounded-2xl bg-gradient-to-br from-[#FAF2E8] to-[#FFFDF9] border-2 border-dashed border-[#D9C4B2] flex flex-col items-center justify-center p-4 text-center">
-                    <ImageIcon className="w-8 h-8 text-[#B45309] mb-2" />
-                    <span className="font-mono text-xs font-semibold text-[#78350F] bg-white/90 px-3 py-1 rounded-md border border-[#E9D9C9] shadow-2xs">
-                      {product.photoPlaceholder}
-                    </span>
-                    <span className={`absolute top-3 right-3 text-[11px] font-bold uppercase px-3 py-1 rounded-full border shadow-2xs ${product.accent}`}>
-                      {product.badge}
-                    </span>
-                  </div>
-                </div>
+                {/* Product Photo Placeholder Frame or Live Image */}
+                <div>
+                  <div className="p-4 pb-0">
+                    <div className="relative aspect-4/3 w-full rounded-2xl bg-gradient-to-br from-[#FAF2E8] to-[#FFFDF9] border-2 border-dashed border-[#D9C4B2] flex flex-col items-center justify-center p-4 text-center overflow-hidden">
+                      {product.imageUrl ? (
+                        <img 
+                          src={product.imageUrl} 
+                          alt={product.name} 
+                          className="w-full h-full object-cover rounded-xl"
+                        />
+                      ) : (
+                        <>
+                          <ImageIcon className="w-8 h-8 text-[#B45309] mb-2" />
+                          <span className="font-mono text-xs font-semibold text-[#78350F] bg-white/90 px-3 py-1 rounded-md border border-[#E9D9C9] shadow-2xs">
+                            {product.photoPlaceholder}
+                          </span>
+                        </>
+                      )}
 
-                {/* Details */}
-                <div className="p-6 flex-1 flex flex-col justify-between space-y-4">
-                  <div>
+                      {/* Pill Badges */}
+                      <div className="absolute top-3 right-3 flex flex-col gap-1 items-end">
+                        {product.isSoldOut ? (
+                          <span className="text-[10px] font-bold uppercase px-3 py-1 rounded-full bg-stone-800 text-white shadow-2xs">
+                            Sold Out Today
+                          </span>
+                        ) : (
+                          <span className={`text-[11px] font-bold uppercase px-3 py-1 rounded-full border shadow-2xs ${product.accent || 'bg-amber-100 text-amber-900 border-amber-300'}`}>
+                            {product.badge}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Details */}
+                  <div className="p-6 pb-2 space-y-3">
                     <h3 className="font-serif text-lg sm:text-xl font-bold text-[#451A03] mb-1.5">
                       {product.name}
                     </h3>
@@ -469,32 +596,36 @@ export default function App() {
                       <span>{product.availability}</span>
                     </div>
                   </div>
+                </div>
 
-                  {/* Pricing Badge & Inquiry Trigger */}
-                  <div className="pt-4 border-t border-[#F5EBE1] flex items-center justify-between gap-2">
-                    <div>
-                      <span className="block text-[10px] uppercase tracking-wider text-[#786C62] font-bold">
-                        Pricing / Status
-                      </span>
-                      <span className="font-mono text-xs font-bold text-[#78350F] bg-[#FEF3C7] px-2 py-0.5 rounded border border-[#FDE68A]">
-                        {product.priceBadge}
-                      </span>
-                    </div>
-
-                    <a 
-                      href="#inquiry-section"
-                      onClick={() => {
-                        setFormState(prev => ({
-                          ...prev,
-                          themeDescription: `Inquiring for: ${product.name} (${product.priceBadge})`
-                        }));
-                      }}
-                      className="px-4 py-2 rounded-full bg-[#F5EBE1] hover:bg-[#EBDCCE] text-[#451A03] text-xs font-semibold transition-colors flex items-center gap-1 shrink-0"
-                    >
-                      <span>Inquire</span>
-                      <ChevronRight className="w-3.5 h-3.5" />
-                    </a>
+                {/* Pricing Badge & Inquiry Trigger */}
+                <div className="p-6 pt-4 border-t border-[#F5EBE1] flex items-center justify-between gap-2">
+                  <div>
+                    <span className="block text-[10px] uppercase tracking-wider text-[#786C62] font-bold">
+                      Pricing / Status
+                    </span>
+                    <span className="font-mono text-xs font-bold text-[#78350F] bg-[#FEF3C7] px-2 py-0.5 rounded border border-[#FDE68A]">
+                      {product.priceBadge}
+                    </span>
                   </div>
+
+                  <a 
+                    href="#inquiry-section"
+                    onClick={() => {
+                      setFormState(prev => ({
+                        ...prev,
+                        themeDescription: `Inquiring for: ${product.name} (${product.priceBadge})`
+                      }));
+                    }}
+                    className={`px-4 py-2 rounded-full text-xs font-semibold transition-colors flex items-center gap-1 shrink-0 ${
+                      product.isSoldOut
+                        ? 'bg-stone-100 text-stone-500 hover:bg-stone-200'
+                        : 'bg-[#F5EBE1] hover:bg-[#EBDCCE] text-[#451A03]'
+                    }`}
+                  >
+                    <span>{product.isSoldOut ? 'Inquire Next Batch' : 'Inquire'}</span>
+                    <ChevronRight className="w-3.5 h-3.5" />
+                  </a>
                 </div>
               </div>
             ))}
@@ -1014,8 +1145,23 @@ export default function App() {
             <div>
               © {new Date().getFullYear()} Jas 'N Joy Cakes and Pastries. All business facts sourced accurately.
             </div>
-            <div>
-              Centralized store: <code className="text-amber-300 font-mono">src/data/bakeryData.js</code>
+
+            {/* Subtle & Discreet Owner Portal Access */}
+            <div className="flex items-center gap-4">
+              <span>Centralized: <code className="text-amber-300 font-mono">src/data/bakeryData.js</code></span>
+              <span className="text-stone-600">•</span>
+              <button
+                type="button"
+                onClick={() => {
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                  setCurrentView('portal');
+                }}
+                className="inline-flex items-center gap-1.5 text-stone-400 hover:text-amber-200 transition-colors px-2.5 py-1 rounded-md hover:bg-amber-950/80 border border-transparent hover:border-amber-900/50"
+                title="Baker / Owner Administration Login"
+              >
+                <Lock className="w-3 h-3 text-amber-400/80" />
+                <span>Owner Portal</span>
+              </button>
             </div>
           </div>
 
@@ -1045,7 +1191,7 @@ export default function App() {
             <div className="w-full aspect-square max-w-xs sm:max-w-sm mx-auto rounded-2xl overflow-hidden bg-white border border-[#E9D9C9] p-2 shadow-inner">
               <img 
                 src={bakeryInfo.logoUrl} 
-                alt="Jas 'N Joy Cakes and Pastries Logo"
+                alt="Jas 'N Joy Cakes and Pastries Logo" 
                 className="w-full h-full object-contain"
               />
             </div>

@@ -1,0 +1,947 @@
+import React, { useState } from 'react';
+import { 
+  Lock, 
+  Store, 
+  Plus, 
+  Edit3, 
+  Trash2, 
+  RotateCcw, 
+  CheckCircle, 
+  AlertTriangle, 
+  Calendar, 
+  Image as ImageIcon, 
+  Upload, 
+  LogOut, 
+  Bell, 
+  Sparkles, 
+  Inbox, 
+  Tag, 
+  Eye, 
+  Layers, 
+  Check, 
+  X,
+  Clock,
+  MapPin,
+  ChevronRight,
+  ShieldCheck
+} from 'lucide-react';
+import { bakeryInfo, categories } from '../data/bakeryData';
+
+export default function OwnerPortal({ 
+  onBackToStorefront,
+  products,
+  onUpdateProducts,
+  onResetProducts,
+  announcement,
+  onUpdateAnnouncement,
+  onResetAnnouncement,
+  inquiries
+}) {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [loginForm, setLoginForm] = useState({ username: '', password: '' });
+  const [loginError, setLoginError] = useState('');
+
+  // Active Tab inside Portal
+  const [activeTab, setActiveTab] = useState('catalog'); // 'catalog' | 'slots' | 'inquiries'
+
+  // Product Form Modal state (Create / Edit)
+  const [isProductModalOpen, setIsProductModalOpen] = useState(false);
+  const [editingProduct, setEditingProduct] = useState(null);
+  const [productForm, setProductForm] = useState({
+    name: '',
+    category: 'display-cakes',
+    description: '',
+    priceBadge: '[In-Store Pricing / Inquire]',
+    badge: 'Ready in Display',
+    availability: 'Daily Walk-in / Ready-to-Go',
+    photoPlaceholder: '',
+    imageUrl: '',
+    isSoldOut: false
+  });
+
+  // Slot Banner Form state
+  const [slotText, setSlotText] = useState(announcement.text);
+  const [slotStatus, setSlotStatus] = useState(announcement.status || 'open'); // 'open' | 'limited' | 'full'
+  const [slotSaveNotice, setSlotSaveNotice] = useState(false);
+
+  // Filter for Portal Catalog list
+  const [portalCategoryFilter, setPortalCategoryFilter] = useState('all');
+
+  const handleLogin = (e) => {
+    e.preventDefault();
+    if (loginForm.username.trim() === 'admin' && loginForm.password.trim() === 'admin') {
+      setIsAuthenticated(true);
+      setLoginError('');
+    } else {
+      setLoginError('Invalid credentials. Please use demo username: admin and password: admin');
+    }
+  };
+
+  const openAddProductModal = () => {
+    setEditingProduct(null);
+    setProductForm({
+      name: '',
+      category: 'display-cakes',
+      description: '',
+      priceBadge: '[In-Store Pricing / Inquire]',
+      badge: 'Ready in Display',
+      availability: 'Daily Walk-in / Ready-to-Go',
+      photoPlaceholder: '',
+      imageUrl: '',
+      isSoldOut: false
+    });
+    setIsProductModalOpen(true);
+  };
+
+  const openEditProductModal = (prod) => {
+    setEditingProduct(prod);
+    setProductForm({
+      name: prod.name || '',
+      category: prod.category || 'display-cakes',
+      description: prod.description || '',
+      priceBadge: prod.priceBadge || '',
+      badge: prod.badge || '',
+      availability: prod.availability || '',
+      photoPlaceholder: prod.photoPlaceholder || '',
+      imageUrl: prod.imageUrl || '',
+      isSoldOut: !!prod.isSoldOut
+    });
+    setIsProductModalOpen(true);
+  };
+
+  const handleSaveProduct = (e) => {
+    e.preventDefault();
+    if (editingProduct) {
+      // Update
+      const updated = products.map(p => {
+        if (p.id === editingProduct.id) {
+          return {
+            ...p,
+            ...productForm,
+            photoPlaceholder: productForm.photoPlaceholder || `[Photo Placeholder: ${productForm.name}]`
+          };
+        }
+        return p;
+      });
+      onUpdateProducts(updated);
+    } else {
+      // Add
+      const newProduct = {
+        id: `prod-${Date.now()}`,
+        ...productForm,
+        photoPlaceholder: productForm.photoPlaceholder || `[Photo Placeholder: ${productForm.name}]`,
+        accent: productForm.category === 'custom-fondant' 
+          ? 'bg-pink-100 text-pink-900 border-pink-300' 
+          : productForm.category === 'bite-sized'
+          ? 'bg-stone-200 text-stone-900 border-stone-300'
+          : 'bg-amber-100 text-amber-900 border-amber-300'
+      };
+      onUpdateProducts([newProduct, ...products]);
+    }
+    setIsProductModalOpen(false);
+  };
+
+  const handleDeleteProduct = (id) => {
+    if (window.confirm("Are you sure you want to remove this item from the catalog?")) {
+      const remaining = products.filter(p => p.id !== id);
+      onUpdateProducts(remaining);
+    }
+  };
+
+  const handleToggleSoldOut = (id) => {
+    const updated = products.map(p => {
+      if (p.id === id) {
+        return { ...p, isSoldOut: !p.isSoldOut };
+      }
+      return p;
+    });
+    onUpdateProducts(updated);
+  };
+
+  const handleImageFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const url = URL.createObjectURL(file);
+      setProductForm(prev => ({ ...prev, imageUrl: url }));
+    }
+  };
+
+  const handleSaveSlots = (e) => {
+    e.preventDefault();
+    let badge = "Slot Availability Notice";
+    if (slotStatus === 'open') {
+      badge = "Custom Cake Slots Open";
+    } else if (slotStatus === 'limited') {
+      badge = "Limited Daily Slots";
+    } else if (slotStatus === 'full') {
+      badge = "Fully Booked Today";
+    }
+
+    onUpdateAnnouncement({
+      ...announcement,
+      text: slotText,
+      badge: badge,
+      status: slotStatus
+    });
+    setSlotSaveNotice(true);
+    setTimeout(() => setSlotSaveNotice(false), 3000);
+  };
+
+  const filteredCatalog = portalCategoryFilter === 'all'
+    ? products
+    : products.filter(p => p.category === portalCategoryFilter);
+
+  // If Not Authenticated, show Login Screen
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-[#FFFDF9] flex flex-col justify-center items-center px-4 py-12 selection:bg-amber-200 selection:text-amber-900">
+        
+        {/* Back Button */}
+        <div className="w-full max-w-md mb-6">
+          <button
+            onClick={onBackToStorefront}
+            className="inline-flex items-center gap-2 text-xs font-semibold text-[#78350F] hover:text-[#451A03] transition-colors"
+          >
+            <Store className="w-4 h-4" />
+            <span>← Return to Public Storefront</span>
+          </button>
+        </div>
+
+        {/* Login Box */}
+        <div className="w-full max-w-md bg-white rounded-3xl border border-[#E9D9C9] p-8 sm:p-10 shadow-lg relative">
+          
+          <div className="text-center mb-8">
+            <div className="w-16 h-16 rounded-2xl bg-[#FAF2E8] border border-[#E9D9C9] flex items-center justify-center mx-auto mb-4 text-[#92400E] shadow-2xs">
+              <Lock className="w-7 h-7" />
+            </div>
+            <span className="text-[11px] font-bold uppercase tracking-wider text-[#92400E] bg-[#FEF3C7] px-3 py-1 rounded-full border border-[#FDE68A]">
+              Owner & Baker Administration
+            </span>
+            <h1 className="font-serif text-2xl sm:text-3xl font-bold text-[#451A03] mt-3">
+              Owner Portal Login
+            </h1>
+            <p className="text-xs text-[#786C62] mt-1.5">
+              Secure catalog and custom slot management for <strong>{bakeryInfo.owner}</strong>.
+            </p>
+          </div>
+
+          {loginError && (
+            <div className="mb-6 p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-start gap-2.5">
+              <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5 text-rose-600" />
+              <span>{loginError}</span>
+            </div>
+          )}
+
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div>
+              <label className="block text-xs font-bold uppercase tracking-wider text-[#57483D] mb-1.5">
+                Username
+              </label>
+              <input 
+                type="text"
+                required
+                value={loginForm.username}
+                onChange={(e) => setLoginForm({ ...loginForm, username: e.target.value })}
+                placeholder="admin"
+                className="w-full px-4 py-3 rounded-xl border border-[#D9C4B2] bg-[#FFFDF9] text-sm text-[#451A03] focus:outline-none focus:ring-2 focus:ring-[#92400E]/20 focus:border-[#92400E]"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold uppercase tracking-wider text-[#57483D] mb-1.5">
+                Password
+              </label>
+              <input 
+                type="password"
+                required
+                value={loginForm.password}
+                onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })}
+                placeholder="••••••••"
+                className="w-full px-4 py-3 rounded-xl border border-[#D9C4B2] bg-[#FFFDF9] text-sm text-[#451A03] focus:outline-none focus:ring-2 focus:ring-[#92400E]/20 focus:border-[#92400E]"
+              />
+            </div>
+
+            {/* Prototype Credentials helper note */}
+            <div className="p-3.5 rounded-xl bg-[#FAF2E8] border border-[#E9D9C9] text-[11px] text-[#78350F] flex items-center justify-between">
+              <span>Prototype Testing Login:</span>
+              <code className="font-mono bg-white px-2 py-0.5 rounded border border-[#D9C4B2] text-[#451A03] font-bold">
+                admin / admin
+              </code>
+            </div>
+
+            <button
+              type="submit"
+              className="w-full py-3.5 rounded-2xl bg-[#92400E] hover:bg-[#78350F] text-white font-bold text-sm shadow-xs hover:shadow transition-all flex items-center justify-center gap-2 mt-2"
+            >
+              <Lock className="w-4 h-4 text-amber-200" />
+              <span>Sign In to Owner Portal</span>
+            </button>
+          </form>
+
+          <div className="mt-8 pt-6 border-t border-[#F5EBE1] text-center text-[11px] text-[#786C62]">
+            DTI & BIR Registered • Jas 'N Joy Cakes and Pastries • Pueblo de Panay
+          </div>
+        </div>
+
+      </div>
+    );
+  }
+
+  // Authenticated Owner / Baker Dashboard
+  return (
+    <div className="min-h-screen bg-[#FFFDF9] text-[#2D241E] flex flex-col selection:bg-amber-200 selection:text-amber-900">
+      
+      {/* Top Portal Header */}
+      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-[#E9D9C9] shadow-2xs">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+          
+          <div className="flex items-center gap-3">
+            <div className="w-11 h-11 rounded-xl overflow-hidden bg-[#FAF2E8] border border-[#E9D9C9] p-0.5">
+              <img 
+                src={bakeryInfo.logoUrl} 
+                alt="Jas N Joy Logo" 
+                className="w-full h-full object-contain"
+              />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="font-serif text-lg font-bold text-[#451A03]">
+                  {bakeryInfo.brandName}
+                </span>
+                <span className="text-[10px] font-bold uppercase tracking-wider bg-[#FEF3C7] text-[#92400E] px-2 py-0.5 rounded-full border border-[#FDE68A]">
+                  Owner Portal
+                </span>
+              </div>
+              <span className="text-xs text-[#786C62]">
+                Logged in as <strong>{bakeryInfo.owner}</strong> ({bakeryInfo.ownerEmail})
+              </span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <button
+              onClick={onBackToStorefront}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#FAF2E8] hover:bg-[#F5EBE1] border border-[#D9C4B2] text-xs font-semibold text-[#451A03] transition-colors"
+            >
+              <Store className="w-4 h-4 text-[#92400E]" />
+              <span className="hidden sm:inline">View Public Storefront</span>
+            </button>
+            <button
+              onClick={() => setIsAuthenticated(false)}
+              className="p-2 sm:px-3 sm:py-2 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-semibold transition-colors flex items-center gap-1.5"
+              title="Sign Out"
+            >
+              <LogOut className="w-4 h-4" />
+              <span className="hidden sm:inline">Sign Out</span>
+            </button>
+          </div>
+
+        </div>
+
+        {/* Portal Navigation Tabs */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-t border-[#F5EBE1] flex items-center gap-2 overflow-x-auto py-2.5">
+          <button
+            onClick={() => setActiveTab('catalog')}
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shrink-0 ${
+              activeTab === 'catalog'
+                ? 'bg-[#92400E] text-white shadow-2xs'
+                : 'text-[#57483D] hover:bg-[#FAF2E8]'
+            }`}
+          >
+            <Layers className="w-4 h-4" />
+            <span>Bakeshop Catalog ({products.length})</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('slots')}
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shrink-0 ${
+              activeTab === 'slots'
+                ? 'bg-[#92400E] text-white shadow-2xs'
+                : 'text-[#57483D] hover:bg-[#FAF2E8]'
+            }`}
+          >
+            <Bell className="w-4 h-4" />
+            <span>Slot Availability Banner</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('inquiries')}
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shrink-0 ${
+              activeTab === 'inquiries'
+                ? 'bg-[#92400E] text-white shadow-2xs'
+                : 'text-[#57483D] hover:bg-[#FAF2E8]'
+            }`}
+          >
+            <Inbox className="w-4 h-4" />
+            <span>Custom Cake Inquiries ({inquiries?.length || 0})</span>
+          </button>
+        </div>
+      </header>
+
+      {/* Main Dashboard Workspace */}
+      <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
+        
+        {/* TAB 1: Bakeshop Catalog Manager */}
+        {activeTab === 'catalog' && (
+          <div className="space-y-6">
+            
+            {/* Action Bar */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-[#E9D9C9] shadow-2xs">
+              <div>
+                <h2 className="font-serif text-2xl font-bold text-[#451A03]">
+                  Catalog & Menu Items
+                </h2>
+                <p className="text-xs text-[#786C62] mt-0.5">
+                  Manage display cakes, bespoke fondant items, and bite-sized pastries shown on the public site.
+                </p>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2.5">
+                <button
+                  onClick={onResetProducts}
+                  className="px-3.5 py-2.5 rounded-xl border border-stone-300 hover:bg-stone-50 text-xs font-semibold text-stone-700 transition-colors flex items-center gap-1.5"
+                  title="Restore initial products from bakeryData.js"
+                >
+                  <RotateCcw className="w-3.5 h-3.5" />
+                  <span>Reset to Default Data</span>
+                </button>
+                <button
+                  onClick={openAddProductModal}
+                  className="px-5 py-2.5 rounded-xl bg-[#92400E] hover:bg-[#78350F] text-white text-xs font-bold shadow-xs transition-all flex items-center gap-2"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Add New Product</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Category Filter Pills */}
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-xs font-bold text-[#786C62] mr-2">Filter View:</span>
+              {categories.map((c) => (
+                <button
+                  key={c.id}
+                  onClick={() => setPortalCategoryFilter(c.id)}
+                  className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all ${
+                    portalCategoryFilter === c.id
+                      ? 'bg-[#451A03] text-white'
+                      : 'bg-white text-[#57483D] border border-[#E9D9C9] hover:bg-[#FAF2E8]'
+                  }`}
+                >
+                  {c.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Catalog Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredCatalog.map((prod) => (
+                <div 
+                  key={prod.id} 
+                  className={`bg-white rounded-3xl border transition-all overflow-hidden flex flex-col justify-between ${
+                    prod.isSoldOut ? 'border-stone-300 opacity-80' : 'border-[#E9D9C9] shadow-2xs'
+                  }`}
+                >
+                  <div>
+                    {/* Image / Placeholder Area */}
+                    <div className="relative aspect-16/10 w-full bg-[#FAF2E8] border-b border-[#E9D9C9] overflow-hidden flex items-center justify-center p-3">
+                      {prod.imageUrl ? (
+                        <img 
+                          src={prod.imageUrl} 
+                          alt={prod.name} 
+                          className="w-full h-full object-cover rounded-xl"
+                        />
+                      ) : (
+                        <div className="text-center p-4">
+                          <ImageIcon className="w-7 h-7 text-[#B45309] mx-auto mb-1.5" />
+                          <span className="font-mono text-[11px] font-bold text-[#78350F] bg-white/90 px-2.5 py-1 rounded border border-[#E9D9C9]">
+                            {prod.photoPlaceholder || `[Photo: ${prod.name}]`}
+                          </span>
+                        </div>
+                      )}
+
+                      {/* Status Badges */}
+                      <div className="absolute top-3 right-3 flex flex-col gap-1 items-end">
+                        {prod.isSoldOut ? (
+                          <span className="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase bg-stone-800 text-white shadow-xs">
+                            Sold Out Today
+                          </span>
+                        ) : (
+                          <span className="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase bg-emerald-600 text-white shadow-xs">
+                            Available in Store
+                          </span>
+                        )}
+                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold border ${prod.accent || 'bg-amber-100 text-amber-900'}`}>
+                          {prod.badge || 'Item'}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Details */}
+                    <div className="p-5 space-y-2">
+                      <div className="flex items-start justify-between gap-2">
+                        <h3 className="font-serif text-lg font-bold text-[#451A03] leading-snug">
+                          {prod.name}
+                        </h3>
+                      </div>
+                      <p className="text-xs text-[#57483D] line-clamp-2 leading-relaxed">
+                        {prod.description}
+                      </p>
+                      
+                      <div className="pt-2 flex flex-wrap items-center gap-2 text-xs">
+                        <span className="font-mono font-bold text-[#78350F] bg-[#FEF3C7] px-2 py-0.5 rounded border border-[#FDE68A]">
+                          {prod.priceBadge}
+                        </span>
+                        <span className="text-[11px] text-[#786C62]">
+                          • {prod.availability}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Baker Action Buttons */}
+                  <div className="p-5 pt-0 border-t border-[#F5EBE1] flex items-center justify-between gap-2 mt-4">
+                    <button
+                      type="button"
+                      onClick={() => handleToggleSoldOut(prod.id)}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition-colors ${
+                        prod.isSoldOut
+                          ? 'bg-emerald-50 text-emerald-800 border-emerald-200 hover:bg-emerald-100'
+                          : 'bg-stone-100 text-stone-700 border-stone-200 hover:bg-stone-200'
+                      }`}
+                    >
+                      {prod.isSoldOut ? 'Mark Available' : 'Mark Sold Out'}
+                    </button>
+
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        onClick={() => openEditProductModal(prod)}
+                        className="p-2 rounded-xl text-[#92400E] hover:bg-[#FAF2E8] border border-[#E9D9C9] transition-colors"
+                        title="Edit Item Details"
+                      >
+                        <Edit3 className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteProduct(prod.id)}
+                        className="p-2 rounded-xl text-rose-700 hover:bg-rose-50 border border-rose-200 transition-colors"
+                        title="Delete Item"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+          </div>
+        )}
+
+        {/* TAB 2: Slot Availability Banner Editor */}
+        {activeTab === 'slots' && (
+          <div className="max-w-3xl mx-auto space-y-6">
+            <div className="bg-white rounded-3xl border border-[#E9D9C9] p-6 sm:p-8 shadow-2xs space-y-6">
+              
+              <div className="flex items-center justify-between gap-4 border-b border-[#F5EBE1] pb-4">
+                <div>
+                  <h2 className="font-serif text-2xl font-bold text-[#451A03]">
+                    Daily Custom Slot Availability
+                  </h2>
+                  <p className="text-xs text-[#786C62] mt-0.5">
+                    Controls the sticky top notice banner shown across the public storefront.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={onResetAnnouncement}
+                  className="px-3 py-1.5 rounded-xl border border-stone-300 hover:bg-stone-50 text-xs font-semibold text-stone-700 transition-colors flex items-center gap-1.5"
+                >
+                  <RotateCcw className="w-3.5 h-3.5" />
+                  <span>Reset Default</span>
+                </button>
+              </div>
+
+              {slotSaveNotice && (
+                <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-emerald-600" />
+                  <span>Public announcement banner updated successfully!</span>
+                </div>
+              )}
+
+              <form onSubmit={handleSaveSlots} className="space-y-6">
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-[#57483D] mb-2">
+                    Current Slot Status:
+                  </label>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSlotStatus('open');
+                        setSlotText("Mabuhay, Joyful Suki! Custom celebration cake slots for this week are OPEN. Reserve 3 to 5 days ahead!");
+                      }}
+                      className={`p-4 rounded-2xl border text-left transition-all ${
+                        slotStatus === 'open' 
+                          ? 'bg-emerald-50 border-emerald-300 text-emerald-950 ring-2 ring-emerald-500/20' 
+                          : 'bg-[#FFFDF9] border-[#D9C4B2] text-[#57483D] hover:bg-[#FAF2E8]'
+                      }`}
+                    >
+                      <span className="block font-serif text-sm font-bold text-emerald-900">🟢 Slots Open</span>
+                      <span className="text-[11px] text-stone-600 mt-1 block">Accepting daily orders</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSlotStatus('limited');
+                        setSlotText("Mabuhay, Joyful Suki! Daily custom cake slots are limited to ensure top handcrafted quality. Please reserve your celebration slots 3 to 5 days ahead!");
+                      }}
+                      className={`p-4 rounded-2xl border text-left transition-all ${
+                        slotStatus === 'limited' 
+                          ? 'bg-amber-50 border-amber-300 text-amber-950 ring-2 ring-amber-500/20' 
+                          : 'bg-[#FFFDF9] border-[#D9C4B2] text-[#57483D] hover:bg-[#FAF2E8]'
+                      }`}
+                    >
+                      <span className="block font-serif text-sm font-bold text-amber-900">🟡 Limited Slots</span>
+                      <span className="text-[11px] text-stone-600 mt-1 block">Few reservation spaces left</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSlotStatus('full');
+                        setSlotText("Notice: Custom cake slots for today are FULLY BOOKED! Walk-in display cakes & pastries remain available at our terminal shop.");
+                      }}
+                      className={`p-4 rounded-2xl border text-left transition-all ${
+                        slotStatus === 'full' 
+                          ? 'bg-rose-50 border-rose-300 text-rose-950 ring-2 ring-rose-500/20' 
+                          : 'bg-[#FFFDF9] border-[#D9C4B2] text-[#57483D] hover:bg-[#FAF2E8]'
+                      }`}
+                    >
+                      <span className="block font-serif text-sm font-bold text-rose-900">🔴 Fully Booked</span>
+                      <span className="text-[11px] text-stone-600 mt-1 block">Display walk-in only</span>
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-[#57483D] mb-1.5">
+                    Banner Announcement Text
+                  </label>
+                  <textarea
+                    rows="3"
+                    required
+                    value={slotText}
+                    onChange={(e) => setSlotText(e.target.value)}
+                    className="w-full px-4 py-3 rounded-2xl border border-[#D9C4B2] bg-[#FFFDF9] text-sm text-[#451A03] focus:outline-none focus:ring-2 focus:ring-[#92400E]/20 focus:border-[#92400E]"
+                  />
+                  <p className="text-[11px] text-[#786C62] mt-1">
+                    Keep messages concise so Joyful Suki customers can easily read it on mobile devices.
+                  </p>
+                </div>
+
+                {/* Live Banner Preview Box */}
+                <div>
+                  <span className="block text-[11px] uppercase font-bold tracking-wider text-[#786C62] mb-1.5">
+                    Storefront Live Preview:
+                  </span>
+                  <div className="bg-[#78350F] text-[#FEF3C7] rounded-2xl p-4 text-xs font-medium flex items-center justify-between gap-3 shadow-xs">
+                    <div className="flex items-center gap-2">
+                      <span className="px-2 py-0.5 rounded-full bg-amber-600/60 border border-amber-400/40 text-[10px] font-bold uppercase tracking-wider text-amber-100">
+                        {slotStatus === 'open' ? 'Custom Cake Slots Open' : slotStatus === 'full' ? 'Fully Booked Today' : 'Slot Availability Notice'}
+                      </span>
+                      <span>{slotText}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-2 flex justify-end">
+                  <button
+                    type="submit"
+                    className="px-6 py-3 rounded-full bg-[#92400E] hover:bg-[#78350F] text-white text-xs font-bold shadow-xs hover:shadow transition-all flex items-center gap-2"
+                  >
+                    <Check className="w-4 h-4 text-amber-200" />
+                    <span>Publish Banner to Storefront</span>
+                  </button>
+                </div>
+              </form>
+
+            </div>
+          </div>
+        )}
+
+        {/* TAB 3: Custom Cake Inquiries Log */}
+        {activeTab === 'inquiries' && (
+          <div className="space-y-6">
+            <div className="bg-white p-6 rounded-3xl border border-[#E9D9C9] shadow-2xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div>
+                <h2 className="font-serif text-2xl font-bold text-[#451A03]">
+                  Custom Cake Inquiry Log
+                </h2>
+                <p className="text-xs text-[#786C62] mt-0.5">
+                  Submissions received from the public Custom Cake Request form.
+                </p>
+              </div>
+              <span className="px-3.5 py-1.5 rounded-full bg-[#FAF2E8] border border-[#E9D9C9] text-xs font-bold text-[#78350F]">
+                Total Received: {inquiries?.length || 0}
+              </span>
+            </div>
+
+            {(!inquiries || inquiries.length === 0) ? (
+              <div className="bg-white rounded-3xl border border-dashed border-[#D9C4B2] p-12 text-center max-w-lg mx-auto">
+                <div className="w-16 h-16 rounded-2xl bg-[#FAF2E8] flex items-center justify-center text-[#92400E] mx-auto mb-3">
+                  <Inbox className="w-8 h-8" />
+                </div>
+                <h3 className="font-serif text-xl font-bold text-[#451A03]">No Inquiries Logged Yet</h3>
+                <p className="text-xs text-[#786C62] mt-1 max-w-xs mx-auto">
+                  When customers submit the Custom Cake Inquiry Form on the storefront, their details will appear here immediately.
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {inquiries.map((inq, idx) => (
+                  <div key={idx} className="bg-white rounded-3xl border border-[#E9D9C9] p-6 shadow-2xs space-y-4">
+                    <div className="flex justify-between items-start border-b border-[#F5EBE1] pb-3">
+                      <div>
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-[#92400E] bg-[#FEF3C7] px-2.5 py-0.5 rounded-full border border-[#FDE68A]">
+                          {inq.eventType}
+                        </span>
+                        <h4 className="font-serif text-lg font-bold text-[#451A03] mt-1.5">
+                          {inq.customerName}
+                        </h4>
+                      </div>
+                      <span className="font-mono text-[11px] text-[#786C62]">
+                        {inq.timestamp}
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3 text-xs text-[#57483D]">
+                      <div>
+                        <span className="text-[10px] uppercase font-bold text-[#786C62] block">Contact Number</span>
+                        <strong className="text-[#451A03]">{inq.contactNumber}</strong>
+                      </div>
+                      <div>
+                        <span className="text-[10px] uppercase font-bold text-[#786C62] block">Event Date</span>
+                        <strong className="text-[#451A03]">{inq.preferredDate || 'TBD'}</strong>
+                      </div>
+                      <div>
+                        <span className="text-[10px] uppercase font-bold text-[#786C62] block">Size / Tiers</span>
+                        <strong className="text-[#451A03]">{inq.cakeSize}</strong>
+                      </div>
+                      <div>
+                        <span className="text-[10px] uppercase font-bold text-[#786C62] block">Fulfillment</span>
+                        <strong className="text-[#451A03]">{inq.fulfillmentMethod}</strong>
+                      </div>
+                    </div>
+
+                    <div className="pt-2 border-t border-[#F5EBE1]">
+                      <span className="text-[10px] uppercase font-bold text-[#786C62] block mb-1">Theme & Notes</span>
+                      <p className="text-xs text-[#451A03] bg-[#FFFDF9] p-3 rounded-xl border border-[#E9D9C9]">
+                        {inq.themeDescription}
+                      </p>
+                    </div>
+
+                    {inq.hasUploadedImage && inq.previewUrl && (
+                      <div className="pt-2 border-t border-[#F5EBE1]">
+                        <span className="text-[10px] uppercase font-bold text-[#786C62] block mb-2">Uploaded Reference</span>
+                        <div className="w-24 h-24 rounded-xl overflow-hidden border border-[#D9C4B2] shadow-2xs">
+                          <img src={inq.previewUrl} alt="Cake reference" className="w-full h-full object-cover" />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+      </main>
+
+      {/* Modal: Add / Edit Product */}
+      {isProductModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-[#E9D9C9] max-h-[90vh] overflow-y-auto">
+            
+            <div className="flex items-center justify-between border-b border-[#F5EBE1] pb-4 mb-5">
+              <div>
+                <h3 className="font-serif text-xl font-bold text-[#451A03]">
+                  {editingProduct ? 'Edit Catalog Item' : 'Add New Item to Catalog'}
+                </h3>
+                <p className="text-xs text-[#786C62]">
+                  Changes are saved to local state and reflected immediately.
+                </p>
+              </div>
+              <button 
+                onClick={() => setIsProductModalOpen(false)}
+                className="p-1.5 rounded-full text-stone-400 hover:text-stone-700 hover:bg-stone-100"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveProduct} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-[#57483D] mb-1">
+                  Product Name *
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Strawberry Shortcake Chiffon"
+                  value={productForm.name}
+                  onChange={(e) => setProductForm({ ...productForm, name: e.target.value })}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#D9C4B2] bg-[#FFFDF9] text-sm text-[#451A03] focus:outline-none focus:ring-2 focus:ring-[#92400E]/20 focus:border-[#92400E]"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-[#57483D] mb-1">
+                    Category *
+                  </label>
+                  <select
+                    value={productForm.category}
+                    onChange={(e) => setProductForm({ ...productForm, category: e.target.value })}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#D9C4B2] bg-[#FFFDF9] text-sm text-[#451A03] focus:outline-none focus:ring-2 focus:ring-[#92400E]/20 focus:border-[#92400E]"
+                  >
+                    <option value="display-cakes">Ready-to-Buy Display Cakes</option>
+                    <option value="custom-fondant">Customized & Fondant Cakes</option>
+                    <option value="bite-sized">Bite-Sized Pastries & Tubs</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-[#57483D] mb-1">
+                    Pricing Display *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. ₱450.00 or [Custom Quote]"
+                    value={productForm.priceBadge}
+                    onChange={(e) => setProductForm({ ...productForm, priceBadge: e.target.value })}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#D9C4B2] bg-[#FFFDF9] text-sm text-[#451A03] focus:outline-none focus:ring-2 focus:ring-[#92400E]/20 focus:border-[#92400E]"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-[#57483D] mb-1">
+                  Description *
+                </label>
+                <textarea
+                  rows="2"
+                  required
+                  placeholder="Describe sponge, frosting, flavors, or packaging..."
+                  value={productForm.description}
+                  onChange={(e) => setProductForm({ ...productForm, description: e.target.value })}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#D9C4B2] bg-[#FFFDF9] text-sm text-[#451A03] focus:outline-none focus:ring-2 focus:ring-[#92400E]/20 focus:border-[#92400E]"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-[#57483D] mb-1">
+                    Badge Label
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Bestseller, Ready in Display"
+                    value={productForm.badge}
+                    onChange={(e) => setProductForm({ ...productForm, badge: e.target.value })}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#D9C4B2] bg-[#FFFDF9] text-sm text-[#451A03] focus:outline-none focus:ring-2 focus:ring-[#92400E]/20 focus:border-[#92400E]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-[#57483D] mb-1">
+                    Availability / Lead Time
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Daily Walk-in, 3-5 Days Notice"
+                    value={productForm.availability}
+                    onChange={(e) => setProductForm({ ...productForm, availability: e.target.value })}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#D9C4B2] bg-[#FFFDF9] text-sm text-[#451A03] focus:outline-none focus:ring-2 focus:ring-[#92400E]/20 focus:border-[#92400E]"
+                  />
+                </div>
+              </div>
+
+              {/* Image Upload or Placeholder */}
+              <div className="p-4 rounded-2xl bg-[#FAF2E8] border border-[#E9D9C9] space-y-3">
+                <label className="block text-xs font-bold uppercase tracking-wider text-[#451A03]">
+                  Product Photo (Local Upload or Placeholder)
+                </label>
+                
+                <div className="flex items-center gap-3">
+                  <label className="cursor-pointer inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-white border border-[#D9C4B2] text-xs font-semibold text-[#451A03] hover:bg-[#FDF6ED] transition-colors">
+                    <Upload className="w-3.5 h-3.5 text-[#92400E]" />
+                    <span>Upload Local Photo</span>
+                    <input type="file" accept="image/*" onChange={handleImageFileChange} className="hidden" />
+                  </label>
+
+                  {productForm.imageUrl && (
+                    <div className="flex items-center gap-2">
+                      <div className="w-9 h-9 rounded-lg overflow-hidden border border-[#D9C4B2]">
+                        <img src={productForm.imageUrl} alt="preview" className="w-full h-full object-cover" />
+                      </div>
+                      <button 
+                        type="button" 
+                        onClick={() => setProductForm({ ...productForm, imageUrl: '' })}
+                        className="text-[11px] text-rose-700 hover:underline"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                <div>
+                  <input
+                    type="text"
+                    placeholder="Or custom placeholder text: [Photo Placeholder: My Cake]"
+                    value={productForm.photoPlaceholder}
+                    onChange={(e) => setProductForm({ ...productForm, photoPlaceholder: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-[#D9C4B2] bg-white text-xs text-[#451A03]"
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 pt-1">
+                <input
+                  type="checkbox"
+                  id="soldOutCheck"
+                  checked={productForm.isSoldOut}
+                  onChange={(e) => setProductForm({ ...productForm, isSoldOut: e.target.checked })}
+                  className="rounded text-[#92400E] focus:ring-[#92400E]"
+                />
+                <label htmlFor="soldOutCheck" className="text-xs font-semibold text-[#57483D] cursor-pointer">
+                  Mark as "Sold Out Today" in Public Catalog
+                </label>
+              </div>
+
+              <div className="pt-3 border-t border-[#F5EBE1] flex items-center justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setIsProductModalOpen(false)}
+                  className="px-4 py-2 rounded-full text-stone-600 text-xs font-semibold hover:bg-stone-100"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-6 py-2 rounded-full bg-[#92400E] hover:bg-[#78350F] text-white text-xs font-bold shadow-xs"
+                >
+                  {editingProduct ? 'Save Changes' : 'Add Item'}
+                </button>
+              </div>
+            </form>
+
+          </div>
+        </div>
+      )}
+
+    </div>
+  );
+}
