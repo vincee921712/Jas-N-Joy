@@ -53,6 +53,7 @@ export default function App() {
   });
   const [previewImage, setPreviewImage] = useState(null);
   const [submittedSummary, setSubmittedSummary] = useState(null);
+  const [isLogoZoomed, setIsLogoZoomed] = useState(false);
 
   // Filtered Products
   const filteredProducts = selectedCategory === 'all'
@@ -117,20 +118,42 @@ export default function App() {
       <header className="sticky top-0 z-40 bg-[#FFFDF9]/95 backdrop-blur-md border-b border-[#F5EBE1] shadow-2xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
           
-          {/* Logo & Brand Identity */}
-          <a href="#" className="flex items-center gap-3.5 group">
-            <div className="w-12 h-12 rounded-2xl bg-[#FDF6ED] border border-[#E9D9C9] flex items-center justify-center text-[#78350F] shadow-xs group-hover:scale-105 transition-transform">
-              <Cake className="w-6 h-6 text-[#92400E]" />
-            </div>
-            <div>
-              <span className="block font-serif text-xl sm:text-2xl font-bold tracking-tight text-[#451A03]">
-                {bakeryInfo.brandName}
+          {/* Logo & Brand Identity (Clickable to Zoom) */}
+          <div className="flex items-center gap-3.5">
+            <button
+              type="button"
+              onClick={() => setIsLogoZoomed(true)}
+              className="relative group focus:outline-none focus:ring-2 focus:ring-[#92400E] rounded-2xl cursor-zoom-in"
+              title="Click to view Jas 'N Joy Logo"
+              aria-label="Zoom Jas 'N Joy Logo"
+            >
+              <div className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl overflow-hidden bg-white border border-[#E9D9C9] p-0.5 shadow-xs group-hover:scale-105 group-hover:border-[#92400E] transition-all">
+                <img 
+                  src={bakeryInfo.logoUrl} 
+                  alt="Jas 'N Joy Cakes and Pastries Official Logo" 
+                  className="w-full h-full object-contain rounded-xl"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                    e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                  }}
+                />
+                <div className="hidden w-full h-full flex items-center justify-center bg-[#FDF6ED]">
+                  <Cake className="w-6 h-6 text-[#92400E]" />
+                </div>
+              </div>
+              <span className="absolute -bottom-1 -right-1 bg-[#92400E] text-white p-1 rounded-full text-[9px] opacity-0 group-hover:opacity-100 transition-opacity shadow-xs">
+                🔍
               </span>
+            </button>
+            <div>
+              <a href="#" className="block font-serif text-xl sm:text-2xl font-bold tracking-tight text-[#451A03] hover:text-[#92400E] transition-colors">
+                {bakeryInfo.brandName}
+              </a>
               <span className="block text-[11px] font-semibold tracking-wider text-[#92400E] uppercase">
                 {bakeryInfo.tagline}
               </span>
             </div>
-          </a>
+          </div>
 
           {/* Desktop Nav Links */}
           <nav className="hidden lg:flex items-center gap-8 font-medium text-sm text-[#57483D]">
@@ -953,7 +976,18 @@ export default function App() {
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 pb-8 border-b border-amber-900/60">
             <div>
               <div className="flex items-center gap-3">
-                <Cake className="w-6 h-6 text-amber-300" />
+                <button 
+                  type="button" 
+                  onClick={() => setIsLogoZoomed(true)} 
+                  className="w-10 h-10 rounded-xl overflow-hidden bg-white border border-amber-800 p-0.5 hover:scale-105 transition-transform cursor-zoom-in"
+                  title="Click to zoom logo"
+                >
+                  <img 
+                    src={bakeryInfo.logoUrl} 
+                    alt="Jas 'N Joy Logo" 
+                    className="w-full h-full object-contain rounded-lg"
+                  />
+                </button>
                 <span className="font-serif text-lg font-bold text-amber-100">
                   {bakeryInfo.brandName}
                 </span>
@@ -987,6 +1021,50 @@ export default function App() {
 
         </div>
       </footer>
+
+      {/* Lightbox / Zoom Modal for Jas N Joy Logo */}
+      {isLogoZoomed && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-in fade-in duration-200"
+          onClick={() => setIsLogoZoomed(false)}
+        >
+          <div 
+            className="relative bg-white rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl border border-amber-200 text-center animate-in zoom-in-95 duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close Button */}
+            <button
+              onClick={() => setIsLogoZoomed(false)}
+              className="absolute top-4 right-4 p-2 rounded-full text-stone-500 hover:text-stone-900 hover:bg-stone-100 transition-colors"
+              aria-label="Close zoomed logo"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            {/* Zoomed Image */}
+            <div className="w-full aspect-square max-w-xs sm:max-w-sm mx-auto rounded-2xl overflow-hidden bg-white border border-[#E9D9C9] p-2 shadow-inner">
+              <img 
+                src={bakeryInfo.logoUrl} 
+                alt="Jas 'N Joy Cakes and Pastries Logo"
+                className="w-full h-full object-contain"
+              />
+            </div>
+
+            {/* Brand Title & Tagline in Modal */}
+            <div className="mt-5 space-y-1">
+              <h3 className="font-serif text-xl sm:text-2xl font-bold text-[#451A03]">
+                {bakeryInfo.brandName}
+              </h3>
+              <p className="text-xs sm:text-sm font-medium text-[#92400E] italic">
+                "{bakeryInfo.tagline}"
+              </p>
+              <p className="text-[11px] text-[#786C62] pt-2">
+                Click anywhere outside or press Close to dismiss
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );
