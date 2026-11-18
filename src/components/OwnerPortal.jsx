@@ -38,7 +38,7 @@ export default function OwnerPortal({
   inquiries
 }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [loginForm, setLoginForm] = useState({ username: '', password: '' });
+  const [loginForm, setLoginForm] = useState({ username: 'admin', password: 'admin' });
   const [loginError, setLoginError] = useState('');
 
   // Active Tab inside Portal
