@@ -196,15 +196,15 @@ export default function App() {
       {!bannerDismissed && (
         <aside 
           aria-label="Slot Availability Announcement"
-          className="sticky top-0 z-50 bg-[#78350F] text-[#FEF3C7] border-b border-amber-900/40 px-4 py-2.5 text-xs sm:text-sm font-medium shadow-sm transition-all"
+          className="sticky top-0 z-50 bg-[#78350F] text-[#FEF3C7] border-b border-amber-900/40 px-3 sm:px-4 py-2.5 text-xs sm:text-sm font-medium shadow-sm transition-all"
         >
-          <div className="max-w-7xl mx-auto flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2 mx-auto sm:mx-0">
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-600/60 border border-amber-400/40 text-[11px] font-bold uppercase tracking-wider text-amber-100 shrink-0">
-                <Sparkles className="w-3.5 h-3.5 text-amber-200" />
+          <div className="max-w-7xl mx-auto flex items-center justify-between gap-2 sm:gap-3">
+            <div className="flex items-center gap-2 flex-1 min-w-0">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-600/60 border border-amber-400/40 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-amber-100 shrink-0">
+                <Sparkles className="w-3 sm:w-3.5 h-3 sm:h-3.5 text-amber-200" />
                 {announcement.badge || "Slot Notice"}
               </span>
-              <p className="text-center sm:text-left leading-tight">
+              <p className="text-left leading-tight text-xs sm:text-sm truncate sm:overflow-visible sm:whitespace-normal">
                 {announcement.text}
               </p>
             </div>
@@ -549,13 +549,13 @@ export default function App() {
             </p>
           </div>
 
-          {/* Interactive Category Filter Tabs */}
-          <div className="flex flex-wrap justify-center gap-2.5 mb-10">
+          {/* Interactive Category Filter Tabs: Horizontal scroll on mobile, wrap on md+ */}
+          <div className="flex overflow-x-auto flex-nowrap md:flex-wrap md:overflow-visible justify-start md:justify-center gap-2.5 mb-10 pb-2 md:pb-0 px-2 sm:px-0 -mx-4 sm:mx-0 px-4 sm:px-0 scrollbar-none">
             {categories.map((cat) => (
               <button
                 key={cat.id}
                 onClick={() => setSelectedCategory(cat.id)}
-                className={`px-5 py-2.5 rounded-full text-xs sm:text-sm font-semibold transition-all ${
+                className={`px-4 sm:px-5 py-2.5 rounded-full text-xs sm:text-sm font-semibold transition-all whitespace-nowrap shrink-0 ${
                   selectedCategory === cat.id
                     ? 'bg-[#92400E] text-white shadow-xs'
                     : 'bg-white text-[#57483D] hover:bg-[#FAF2E8] border border-[#E9D9C9]'
@@ -1127,7 +1127,7 @@ export default function App() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-[#451A03] text-[#FAF2E8]/80 py-12 text-xs border-t border-amber-950">
+      <footer className="bg-[#451A03] text-[#FAF2E8]/80 pt-12 pb-24 md:pb-12 text-xs border-t border-amber-950">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
           
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 pb-8 border-b border-amber-900/60">
@@ -1193,6 +1193,25 @@ export default function App() {
 
         </div>
       </footer>
+
+      {/* Mobile-Only Sticky Bottom Action Bar (< 768px) */}
+      <div className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-[#FFFDF9]/95 backdrop-blur-md border-t border-[#E9D9C9] px-4 py-2.5 shadow-lg flex items-center gap-2.5">
+        <a
+          href="tel:+639152830284"
+          className="flex-1 min-h-[44px] inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-2xl bg-[#FAF2E8] border border-[#D9C4B2] text-[#451A03] text-xs font-bold hover:bg-[#F5EBE1] transition-colors"
+        >
+          <Phone className="w-4 h-4 text-[#92400E]" />
+          <span>Call Shop</span>
+        </a>
+
+        <a
+          href="#inquiry-section"
+          className="flex-1 min-h-[44px] inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-2xl bg-[#92400E] hover:bg-[#78350F] text-white text-xs font-bold shadow-xs transition-colors"
+        >
+          <Sparkles className="w-4 h-4 text-amber-300" />
+          <span>Custom Cake</span>
+        </a>
+      </div>
 
       {/* Lightbox / Zoom Modal for Jas N Joy Logo */}
       {isLogoZoomed && (

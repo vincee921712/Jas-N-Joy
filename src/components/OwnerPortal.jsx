@@ -505,34 +505,69 @@ export default function OwnerPortal({
                   </div>
 
                   {/* Baker Action Buttons */}
-                  <div className="p-5 pt-0 border-t border-[#F5EBE1] flex items-center justify-between gap-2 mt-4">
-                    <button
-                      type="button"
-                      onClick={() => handleToggleSoldOut(prod.id)}
-                      className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition-colors ${
-                        prod.isSoldOut
-                          ? 'bg-emerald-50 text-emerald-800 border-emerald-200 hover:bg-emerald-100'
-                          : 'bg-stone-100 text-stone-700 border-stone-200 hover:bg-stone-200'
-                      }`}
-                    >
-                      {prod.isSoldOut ? 'Mark Available' : 'Mark Sold Out'}
-                    </button>
+                  <div className="p-5 pt-0 border-t border-[#F5EBE1] mt-4">
+                    {/* Desktop Layout (md: and up - exactly preserved) */}
+                    <div className="hidden md:flex items-center justify-between gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handleToggleSoldOut(prod.id)}
+                        className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition-colors ${
+                          prod.isSoldOut
+                            ? 'bg-emerald-50 text-emerald-800 border-emerald-200 hover:bg-emerald-100'
+                            : 'bg-stone-100 text-stone-700 border-stone-200 hover:bg-stone-200'
+                        }`}
+                      >
+                        {prod.isSoldOut ? 'Mark Available' : 'Mark Sold Out'}
+                      </button>
 
-                    <div className="flex items-center gap-1.5">
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          onClick={() => openEditProductModal(prod)}
+                          className="p-2 rounded-xl text-[#92400E] hover:bg-[#FAF2E8] border border-[#E9D9C9] transition-colors"
+                          title="Edit Item Details"
+                        >
+                          <Edit3 className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteProduct(prod.id)}
+                          className="p-2 rounded-xl text-rose-700 hover:bg-rose-50 border border-rose-200 transition-colors"
+                          title="Delete Item"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Mobile-Only Touch-Friendly Layout (< 768px, min-h-[44px] buttons) */}
+                    <div className="flex md:hidden flex-col gap-2">
                       <button
-                        onClick={() => openEditProductModal(prod)}
-                        className="p-2 rounded-xl text-[#92400E] hover:bg-[#FAF2E8] border border-[#E9D9C9] transition-colors"
-                        title="Edit Item Details"
+                        type="button"
+                        onClick={() => handleToggleSoldOut(prod.id)}
+                        className={`w-full min-h-[44px] px-3 py-2.5 rounded-xl text-xs font-bold border transition-colors flex items-center justify-center ${
+                          prod.isSoldOut
+                            ? 'bg-emerald-50 text-emerald-800 border-emerald-200 hover:bg-emerald-100'
+                            : 'bg-stone-100 text-stone-700 border-stone-200 hover:bg-stone-200'
+                        }`}
                       >
-                        <Edit3 className="w-4 h-4" />
+                        {prod.isSoldOut ? '✓ Mark Available' : '⚠ Mark Sold Out'}
                       </button>
-                      <button
-                        onClick={() => handleDeleteProduct(prod.id)}
-                        className="p-2 rounded-xl text-rose-700 hover:bg-rose-50 border border-rose-200 transition-colors"
-                        title="Delete Item"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+
+                      <div className="grid grid-cols-2 gap-2">
+                        <button
+                          onClick={() => openEditProductModal(prod)}
+                          className="w-full min-h-[44px] px-3 py-2 rounded-xl text-xs font-semibold text-[#92400E] bg-[#FAF2E8] border border-[#E9D9C9] flex items-center justify-center gap-1.5"
+                        >
+                          <Edit3 className="w-4 h-4" />
+                          <span>Edit</span>
+                        </button>
+                        <button
+                          onClick={() => handleDeleteProduct(prod.id)}
+                          className="w-full min-h-[44px] px-3 py-2 rounded-xl text-xs font-semibold text-rose-700 bg-rose-50 border border-rose-200 flex items-center justify-center gap-1.5"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                          <span>Delete</span>
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
