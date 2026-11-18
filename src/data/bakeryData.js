@@ -44,8 +44,9 @@ export const bakeryInfo = {
     mobile: "+63 915 283 0284",
     landline: "+63 36 647 3772",
     email: "razelcfuna@gmail.com",
-    facebookName: "Jas 'N Joy Cakes and Pastries",
-    facebookUrl: "https://www.facebook.com"
+    facebookName: "Jas 'N Joy Cakes and Pastries (@jasnjoy.rxs)",
+    facebookHandle: "@jasnjoy.rxs",
+    facebookUrl: "https://www.facebook.com/jasnjoy.rxs/"
   },
 
   announcement: {
