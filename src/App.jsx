@@ -275,11 +275,25 @@ export default function App() {
               href={bakeryInfo.contact.facebookUrl}
               target="_blank" 
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#92400E] hover:bg-[#78350F] text-[#FFFDF9] text-xs font-semibold shadow-xs hover:shadow transition-all"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-[#92400E] hover:bg-[#78350F] text-[#FFFDF9] text-xs font-semibold shadow-xs hover:shadow transition-all"
             >
               <MessageCircle className="w-4 h-4 text-amber-300" />
               <span>Message on Facebook</span>
             </a>
+
+            {/* Direct Owner Portal Login Button */}
+            <button
+              type="button"
+              onClick={() => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                setCurrentView('portal');
+              }}
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-[#FAF2E8] hover:bg-[#F5EBE1] border border-[#D9C4B2] text-[#451A03] text-xs font-bold transition-all shadow-2xs hover:border-[#92400E]"
+              title="Baker / Owner Administration Login"
+            >
+              <Lock className="w-3.5 h-3.5 text-[#92400E]" />
+              <span>Owner Login</span>
+            </button>
           </div>
 
           {/* Mobile Menu Hamburger */}
@@ -339,6 +353,19 @@ export default function App() {
               <MessageCircle className="w-4 h-4 text-amber-300" />
               <span>Message Us on Facebook</span>
             </a>
+
+            <button
+              type="button"
+              onClick={() => {
+                setIsMobileMenuOpen(false);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                setCurrentView('portal');
+              }}
+              className="w-full flex items-center justify-center gap-2 py-3 rounded-full bg-[#FAF2E8] border border-[#D9C4B2] text-[#451A03] text-xs font-bold"
+            >
+              <Lock className="w-4 h-4 text-[#92400E]" />
+              <span>Owner Portal Login</span>
+            </button>
           </div>
         )}
       </header>
@@ -1146,21 +1173,21 @@ export default function App() {
               © {new Date().getFullYear()} Jas 'N Joy Cakes and Pastries. All business facts sourced accurately.
             </div>
 
-            {/* Subtle & Discreet Owner Portal Access */}
-            <div className="flex items-center gap-4">
-              <span>Centralized: <code className="text-amber-300 font-mono">src/data/bakeryData.js</code></span>
-              <span className="text-stone-600">•</span>
+            {/* Owner Portal Access Button */}
+            <div className="flex flex-wrap items-center gap-3">
+              <span className="hidden sm:inline">Centralized: <code className="text-amber-300 font-mono">src/data/bakeryData.js</code></span>
+              <span className="hidden sm:inline text-stone-600">•</span>
               <button
                 type="button"
                 onClick={() => {
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                   setCurrentView('portal');
                 }}
-                className="inline-flex items-center gap-1.5 text-stone-400 hover:text-amber-200 transition-colors px-2.5 py-1 rounded-md hover:bg-amber-950/80 border border-transparent hover:border-amber-900/50"
+                className="inline-flex items-center gap-2 text-amber-200 bg-amber-900/90 hover:bg-amber-800 transition-all px-3 py-1.5 rounded-full border border-amber-700/80 font-semibold text-xs shadow-xs"
                 title="Baker / Owner Administration Login"
               >
-                <Lock className="w-3 h-3 text-amber-400/80" />
-                <span>Owner Portal</span>
+                <Lock className="w-3.5 h-3.5 text-amber-300" />
+                <span>Owner Portal Login</span>
               </button>
             </div>
           </div>
