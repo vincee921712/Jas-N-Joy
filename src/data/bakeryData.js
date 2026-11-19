@@ -53,6 +53,14 @@ export const bakeryInfo = {
     id: "announcement-2026",
     text: "Mabuhay, Joyful Suki! Daily custom cake slots are limited to ensure top handcrafted quality. Please reserve your celebration slots 3 to 5 days ahead!",
     badge: "Slot Availability Notice"
+  },
+
+  heroShowcase: {
+    badge: "Bespoke Theme Cakes",
+    subBadge: "Fondant, Buttercream & Pull-outs",
+    placeholderText: "[Hero Photo Placeholder: Storefront or Signature Cake Showcase]",
+    description: "Reserved for high-resolution photography of Jas 'N Joy's Pueblo de Panay bakeshop display or featured tiered centerpiece.",
+    imageUrl: ""
   }
 };
 

@@ -64,6 +64,17 @@ export default function App() {
     return bakeryInfo.announcement;
   });
 
+  // LocalStorage Persisted State: Hero Signature Cake Showcase
+  const [heroShowcase, setHeroShowcase] = useState(() => {
+    try {
+      const saved = localStorage.getItem('jasnjoy_hero_showcase');
+      if (saved) return JSON.parse(saved);
+    } catch (e) {
+      console.error("Failed to load hero showcase from localStorage", e);
+    }
+    return bakeryInfo.heroShowcase;
+  });
+
   // LocalStorage Persisted State: Custom Inquiries Log
   const [inquiries, setInquiries] = useState(() => {
     try {
@@ -110,6 +121,25 @@ export default function App() {
     setAnnouncement(bakeryInfo.announcement);
     try {
       localStorage.removeItem('jasnjoy_announcement');
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  // Sync Hero Showcase to localStorage
+  const handleUpdateHeroShowcase = (newShowcase) => {
+    setHeroShowcase(newShowcase);
+    try {
+      localStorage.setItem('jasnjoy_hero_showcase', JSON.stringify(newShowcase));
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const handleResetHeroShowcase = () => {
+    setHeroShowcase(bakeryInfo.heroShowcase);
+    try {
+      localStorage.removeItem('jasnjoy_hero_showcase');
     } catch (e) {
       console.error(e);
     }
@@ -184,6 +214,9 @@ export default function App() {
         announcement={announcement}
         onUpdateAnnouncement={handleUpdateAnnouncement}
         onResetAnnouncement={handleResetAnnouncement}
+        heroShowcase={heroShowcase}
+        onUpdateHeroShowcase={handleUpdateHeroShowcase}
+        onResetHeroShowcase={handleResetHeroShowcase}
         inquiries={inquiries}
       />
     );
@@ -467,19 +500,29 @@ export default function App() {
               </div>
             </div>
 
-            {/* Right Hero Image Placeholder Frame */}
+            {/* Right Hero Image / Signature Cake Showcase Frame */}
             <div className="lg:col-span-5">
               <div className="relative rounded-3xl p-3 bg-gradient-to-br from-[#F5EBE1] via-[#FFFDF9] to-[#FAF2E8] border border-[#E9D9C9] shadow-lg">
-                <div className="w-full aspect-4/3 rounded-2xl bg-[#FFFDF9] border-2 border-dashed border-[#D9C4B2] flex flex-col items-center justify-center p-6 text-center group">
-                  <div className="w-16 h-16 rounded-2xl bg-[#FDF6ED] border border-[#E9D9C9] flex items-center justify-center mb-4 text-[#92400E] shadow-2xs">
-                    <ImageIcon className="w-8 h-8" />
-                  </div>
-                  <span className="font-mono text-xs text-[#78350F] bg-[#FEF3C7] px-3.5 py-1.5 rounded-lg border border-[#FDE68A] font-bold mb-2">
-                    [Hero Photo Placeholder: Storefront or Signature Cake Showcase]
-                  </span>
-                  <p className="text-xs text-[#786C62] max-w-xs leading-relaxed">
-                    Reserved for high-resolution photography of Jas 'N Joy's Pueblo de Panay bakeshop display or featured tiered centerpiece.
-                  </p>
+                <div className="w-full aspect-4/3 rounded-2xl bg-[#FFFDF9] border-2 border-dashed border-[#D9C4B2] flex flex-col items-center justify-center p-6 text-center group overflow-hidden">
+                  {heroShowcase?.imageUrl ? (
+                    <img 
+                      src={heroShowcase.imageUrl} 
+                      alt="Signature Cake Showcase" 
+                      className="w-full h-full object-cover rounded-xl transition-transform duration-500 group-hover:scale-105"
+                    />
+                  ) : (
+                    <>
+                      <div className="w-16 h-16 rounded-2xl bg-[#FDF6ED] border border-[#E9D9C9] flex items-center justify-center mb-4 text-[#92400E] shadow-2xs">
+                        <ImageIcon className="w-8 h-8" />
+                      </div>
+                      <span className="font-mono text-xs text-[#78350F] bg-[#FEF3C7] px-3.5 py-1.5 rounded-lg border border-[#FDE68A] font-bold mb-2">
+                        {heroShowcase?.placeholderText || "[Hero Photo Placeholder: Storefront or Signature Cake Showcase]"}
+                      </span>
+                      <p className="text-xs text-[#786C62] max-w-xs leading-relaxed">
+                        {heroShowcase?.description || "Reserved for high-resolution photography of Jas 'N Joy's Pueblo de Panay bakeshop display or featured tiered centerpiece."}
+                      </p>
+                    </>
+                  )}
                 </div>
 
                 {/* Floating Tag */}
@@ -488,8 +531,8 @@ export default function App() {
                     <Sparkles className="w-4 h-4" />
                   </div>
                   <div>
-                    <span className="block text-xs font-bold text-[#451A03]">Bespoke Theme Cakes</span>
-                    <span className="block text-[11px] text-[#92400E]">Fondant, Buttercream & Pull-outs</span>
+                    <span className="block text-xs font-bold text-[#451A03]">{heroShowcase?.badge || "Bespoke Theme Cakes"}</span>
+                    <span className="block text-[11px] text-[#92400E]">{heroShowcase?.subBadge || "Fondant, Buttercream & Pull-outs"}</span>
                   </div>
                 </div>
               </div>

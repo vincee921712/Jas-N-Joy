@@ -35,6 +35,9 @@ export default function OwnerPortal({
   announcement,
   onUpdateAnnouncement,
   onResetAnnouncement,
+  heroShowcase,
+  onUpdateHeroShowcase,
+  onResetHeroShowcase,
   inquiries
 }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -42,7 +45,17 @@ export default function OwnerPortal({
   const [loginError, setLoginError] = useState('');
 
   // Active Tab inside Portal
-  const [activeTab, setActiveTab] = useState('catalog'); // 'catalog' | 'slots' | 'inquiries'
+  const [activeTab, setActiveTab] = useState('catalog'); // 'catalog' | 'showcase' | 'slots' | 'inquiries'
+
+  // Hero Showcase Form state
+  const [showcaseForm, setShowcaseForm] = useState({
+    badge: heroShowcase?.badge || "Bespoke Theme Cakes",
+    subBadge: heroShowcase?.subBadge || "Fondant, Buttercream & Pull-outs",
+    placeholderText: heroShowcase?.placeholderText || "[Hero Photo Placeholder: Storefront or Signature Cake Showcase]",
+    description: heroShowcase?.description || "Reserved for high-resolution photography of Jas 'N Joy's Pueblo de Panay bakeshop display or featured tiered centerpiece.",
+    imageUrl: heroShowcase?.imageUrl || ""
+  });
+  const [showcaseSaveNotice, setShowcaseSaveNotice] = useState(false);
 
   // Product Form Modal state (Create / Edit)
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
@@ -358,6 +371,18 @@ export default function OwnerPortal({
           </button>
 
           <button
+            onClick={() => setActiveTab('showcase')}
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shrink-0 ${
+              activeTab === 'showcase'
+                ? 'bg-[#92400E] text-white shadow-2xs'
+                : 'text-[#57483D] hover:bg-[#FAF2E8]'
+            }`}
+          >
+            <Sparkles className="w-4 h-4" />
+            <span>Hero Showcase Frame</span>
+          </button>
+
+          <button
             onClick={() => setActiveTab('slots')}
             className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shrink-0 ${
               activeTab === 'slots'
@@ -574,6 +599,200 @@ export default function OwnerPortal({
               ))}
             </div>
 
+          </div>
+        )}
+
+        {/* TAB: Hero Signature Cake Showcase Editor */}
+        {activeTab === 'showcase' && (
+          <div className="max-w-3xl mx-auto space-y-6">
+            <div className="bg-white rounded-3xl border border-[#E9D9C9] p-6 sm:p-8 shadow-2xs space-y-6">
+              
+              <div className="flex items-center justify-between gap-4 border-b border-[#F5EBE1] pb-4">
+                <div>
+                  <h2 className="font-serif text-2xl font-bold text-[#451A03]">
+                    Signature Cake Showcase & Hero Frame
+                  </h2>
+                  <p className="text-xs text-[#786C62] mt-0.5">
+                    Customize the prominent centerpiece image, badge labels, and description on the main hero section.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    onResetHeroShowcase();
+                    setShowcaseForm({
+                      badge: bakeryInfo.heroShowcase.badge,
+                      subBadge: bakeryInfo.heroShowcase.subBadge,
+                      placeholderText: bakeryInfo.heroShowcase.placeholderText,
+                      description: bakeryInfo.heroShowcase.description,
+                      imageUrl: ""
+                    });
+                  }}
+                  className="px-3 py-1.5 rounded-xl border border-stone-300 hover:bg-stone-50 text-xs font-semibold text-stone-700 transition-colors flex items-center gap-1.5"
+                >
+                  <RotateCcw className="w-3.5 h-3.5" />
+                  <span>Reset Default</span>
+                </button>
+              </div>
+
+              {showcaseSaveNotice && (
+                <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-emerald-600" />
+                  <span>Hero Signature Cake showcase updated successfully!</span>
+                </div>
+              )}
+
+              <form 
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  onUpdateHeroShowcase(showcaseForm);
+                  setShowcaseSaveNotice(true);
+                  setTimeout(() => setShowcaseSaveNotice(false), 3000);
+                }} 
+                className="space-y-5"
+              >
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-[#57483D] mb-1.5">
+                      Showcase Badge Title *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={showcaseForm.badge}
+                      onChange={(e) => setShowcaseForm({ ...showcaseForm, badge: e.target.value })}
+                      placeholder="Bespoke Theme Cakes"
+                      className="w-full px-4 py-3 rounded-2xl border border-[#D9C4B2] bg-[#FFFDF9] text-sm text-[#451A03] focus:outline-none focus:ring-2 focus:ring-[#92400E]/20 focus:border-[#92400E]"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-[#57483D] mb-1.5">
+                      Showcase Sub-Badge / Note *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={showcaseForm.subBadge}
+                      onChange={(e) => setShowcaseForm({ ...showcaseForm, subBadge: e.target.value })}
+                      placeholder="Fondant, Buttercream & Pull-outs"
+                      className="w-full px-4 py-3 rounded-2xl border border-[#D9C4B2] bg-[#FFFDF9] text-sm text-[#451A03] focus:outline-none focus:ring-2 focus:ring-[#92400E]/20 focus:border-[#92400E]"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-[#57483D] mb-1.5">
+                    Placeholder Label (Shown if no photo is uploaded)
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={showcaseForm.placeholderText}
+                    onChange={(e) => setShowcaseForm({ ...showcaseForm, placeholderText: e.target.value })}
+                    placeholder="[Hero Photo Placeholder: Storefront or Signature Cake Showcase]"
+                    className="w-full px-4 py-3 rounded-2xl border border-[#D9C4B2] bg-[#FFFDF9] text-sm text-[#451A03] focus:outline-none focus:ring-2 focus:ring-[#92400E]/20 focus:border-[#92400E]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-[#57483D] mb-1.5">
+                    Description & Feature Note
+                  </label>
+                  <textarea
+                    rows="2"
+                    required
+                    value={showcaseForm.description}
+                    onChange={(e) => setShowcaseForm({ ...showcaseForm, description: e.target.value })}
+                    className="w-full px-4 py-3 rounded-2xl border border-[#D9C4B2] bg-[#FFFDF9] text-sm text-[#451A03] focus:outline-none focus:ring-2 focus:ring-[#92400E]/20 focus:border-[#92400E]"
+                  />
+                </div>
+
+                {/* Photo Upload & Preview */}
+                <div className="p-5 rounded-2xl bg-[#FAF2E8] border border-[#E9D9C9] space-y-3">
+                  <span className="block text-xs font-bold uppercase tracking-wider text-[#451A03]">
+                    Showcase Photo Upload (Optional)
+                  </span>
+
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                    <label className="cursor-pointer inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white border border-[#D9C4B2] hover:bg-[#FDF6ED] text-xs font-semibold text-[#451A03] transition-colors shadow-2xs">
+                      <Upload className="w-4 h-4 text-[#92400E]" />
+                      <span>Upload Hero Cake Image</span>
+                      <input 
+                        type="file" 
+                        accept="image/*" 
+                        onChange={(e) => {
+                          const file = e.target.files[0];
+                          if (file) {
+                            const url = URL.createObjectURL(file);
+                            setShowcaseForm({ ...showcaseForm, imageUrl: url });
+                          }
+                        }} 
+                        className="hidden" 
+                      />
+                    </label>
+
+                    {showcaseForm.imageUrl ? (
+                      <div className="flex items-center gap-3">
+                        <div className="w-14 h-14 rounded-xl overflow-hidden border border-[#D9C4B2] shadow-2xs">
+                          <img src={showcaseForm.imageUrl} alt="Hero preview" className="w-full h-full object-cover" />
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setShowcaseForm({ ...showcaseForm, imageUrl: "" })}
+                          className="text-xs text-rose-700 hover:underline font-semibold"
+                        >
+                          Remove Photo
+                        </button>
+                      </div>
+                    ) : (
+                      <span className="text-xs text-[#786C62]">
+                        No image uploaded yet. The clean styled placeholder will display.
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Live Preview Box */}
+                <div>
+                  <span className="block text-[11px] uppercase font-bold tracking-wider text-[#786C62] mb-2">
+                    Hero Showcase Preview:
+                  </span>
+                  <div className="max-w-sm mx-auto rounded-3xl p-3 bg-gradient-to-br from-[#F5EBE1] via-[#FFFDF9] to-[#FAF2E8] border border-[#E9D9C9] shadow-sm relative">
+                    <div className="w-full aspect-4/3 rounded-2xl bg-[#FFFDF9] border-2 border-dashed border-[#D9C4B2] flex flex-col items-center justify-center p-4 text-center overflow-hidden">
+                      {showcaseForm.imageUrl ? (
+                        <img src={showcaseForm.imageUrl} alt="preview" className="w-full h-full object-cover rounded-xl" />
+                      ) : (
+                        <>
+                          <ImageIcon className="w-7 h-7 text-[#92400E] mb-2" />
+                          <span className="font-mono text-[10px] text-[#78350F] bg-[#FEF3C7] px-2.5 py-1 rounded-lg border border-[#FDE68A] font-bold mb-1">
+                            {showcaseForm.placeholderText}
+                          </span>
+                          <p className="text-[10px] text-[#786C62] line-clamp-2">
+                            {showcaseForm.description}
+                          </p>
+                        </>
+                      )}
+                    </div>
+                    <div className="mt-2 text-center">
+                      <span className="inline-block text-[11px] font-bold text-[#451A03]">{showcaseForm.badge}</span>
+                      <span className="block text-[10px] text-[#92400E]">{showcaseForm.subBadge}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-3 border-t border-[#F5EBE1] flex justify-end">
+                  <button
+                    type="submit"
+                    className="px-6 py-3 rounded-full bg-[#92400E] hover:bg-[#78350F] text-white text-xs font-bold shadow-xs hover:shadow transition-all flex items-center gap-2"
+                  >
+                    <Check className="w-4 h-4 text-amber-200" />
+                    <span>Save Showcase Changes</span>
+                  </button>
+                </div>
+              </form>
+
+            </div>
           </div>
         )}
 
