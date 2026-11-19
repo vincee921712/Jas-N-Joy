@@ -484,7 +484,7 @@ export default function OwnerPortal({
                 >
                   <div>
                     {/* Image / Placeholder Area */}
-                    <div className="relative aspect-[16/11] w-full bg-[#FAF2E8] border-b border-[#E9D9C9] overflow-hidden flex items-center justify-center p-3">
+                    <div className="relative aspect-[4/3] w-full bg-[#FAF2E8] border-b border-[#E9D9C9] overflow-hidden flex items-center justify-center p-3">
                       {prod.imageUrl ? (
                         <img 
                           src={prod.imageUrl} 
@@ -833,7 +833,7 @@ export default function OwnerPortal({
                     Hero Showcase Preview:
                   </span>
                   <div className="max-w-sm mx-auto rounded-3xl p-3 bg-gradient-to-br from-[#F5EBE1] via-[#FFFDF9] to-[#FAF2E8] border border-[#E9D9C9] shadow-sm relative">
-                    <div className="w-full aspect-[5/4] rounded-2xl bg-[#FFFDF9] border-2 border-dashed border-[#D9C4B2] flex flex-col items-center justify-center p-4 text-center overflow-hidden">
+                    <div className="w-full aspect-[4/5] sm:aspect-square rounded-2xl bg-[#FFFDF9] border-2 border-dashed border-[#D9C4B2] flex flex-col items-center justify-center p-4 text-center overflow-hidden">
                       {showcaseForm.imageUrl ? (
                         <img 
                           src={showcaseForm.imageUrl} 
