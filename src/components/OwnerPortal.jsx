@@ -65,6 +65,16 @@ export default function OwnerPortal({
     imageY: heroShowcase?.imageY || 0
   });
   const [showcaseSaveNotice, setShowcaseSaveNotice] = useState(false);
+  const [showcaseSavedButtonState, setShowcaseSavedButtonState] = useState(false);
+
+  // Global toast notification state
+  const [toastMessage, setToastMessage] = useState(null);
+  const showToast = (msg) => {
+    setToastMessage(msg);
+    setTimeout(() => {
+      setToastMessage(null);
+    }, 3500);
+  };
 
   // Product Form Modal state (Create / Edit)
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
@@ -166,6 +176,7 @@ export default function OwnerPortal({
         return p;
       });
       onUpdateProducts(updated);
+      showToast(`Updated "${productForm.name}" successfully!`);
     } else {
       // Add
       const newProduct = {
@@ -179,6 +190,7 @@ export default function OwnerPortal({
           : 'bg-amber-100 text-amber-900 border-amber-300'
       };
       onUpdateProducts([newProduct, ...products]);
+      showToast(`Added "${productForm.name}" to catalog!`);
     }
     setIsProductModalOpen(false);
   };
@@ -236,6 +248,7 @@ export default function OwnerPortal({
       status: slotStatus
     });
     setSlotSaveNotice(true);
+    showToast("Announcement banner published to storefront!");
     setTimeout(() => setSlotSaveNotice(false), 3000);
   };
 
@@ -686,7 +699,10 @@ export default function OwnerPortal({
                   e.preventDefault();
                   onUpdateHeroShowcase(showcaseForm);
                   setShowcaseSaveNotice(true);
+                  setShowcaseSavedButtonState(true);
+                  showToast("Showcase changes saved successfully!");
                   setTimeout(() => setShowcaseSaveNotice(false), 3000);
+                  setTimeout(() => setShowcaseSavedButtonState(false), 2500);
                 }} 
                 className="space-y-5"
               >
@@ -862,13 +878,23 @@ export default function OwnerPortal({
                   </div>
                 </div>
 
-                <div className="pt-3 border-t border-[#F5EBE1] flex justify-end">
+                <div className="pt-3 border-t border-[#F5EBE1] flex items-center justify-end gap-3">
+                  {showcaseSaveNotice && (
+                    <span className="text-xs font-semibold text-emerald-700 flex items-center gap-1.5 animate-fade-in">
+                      <CheckCircle className="w-4 h-4 text-emerald-600" />
+                      Changes saved to storefront!
+                    </span>
+                  )}
                   <button
                     type="submit"
-                    className="px-6 py-3 rounded-full bg-[#92400E] hover:bg-[#78350F] text-white text-xs font-bold shadow-xs hover:shadow transition-all flex items-center gap-2"
+                    className={`px-6 py-3 rounded-full text-white text-xs font-bold shadow-xs hover:shadow transition-all flex items-center gap-2 ${
+                      showcaseSavedButtonState 
+                        ? 'bg-emerald-600 hover:bg-emerald-700 scale-102 ring-2 ring-emerald-400/50' 
+                        : 'bg-[#92400E] hover:bg-[#78350F]'
+                    }`}
                   >
-                    <Check className="w-4 h-4 text-amber-200" />
-                    <span>Save Showcase Changes</span>
+                    <Check className={`w-4 h-4 ${showcaseSavedButtonState ? 'text-white' : 'text-amber-200'}`} />
+                    <span>{showcaseSavedButtonState ? '✓ Saved Successfully!' : 'Save Showcase Changes'}</span>
                   </button>
                 </div>
               </form>
@@ -1324,17 +1350,36 @@ export default function OwnerPortal({
                 imageUrl: croppedDataUrl,
                 rawOriginalUrl: cropperModal.rawOriginalUrl || prev.rawOriginalUrl || cropperModal.imageUrl
               }));
+              showToast("Photo cropped & framed! Click 'Save Showcase Changes' to publish.");
             } else if (cropperModal.target === 'product') {
               setProductForm(prev => ({ 
                 ...prev, 
                 imageUrl: croppedDataUrl,
                 rawOriginalUrl: cropperModal.rawOriginalUrl || prev.rawOriginalUrl || cropperModal.imageUrl
               }));
+              showToast("Photo cropped & framed for product!");
             }
             setCropperModal({ isOpen: false, imageUrl: '', rawOriginalUrl: '', target: '', title: '' });
           }}
           onClose={() => setCropperModal({ isOpen: false, imageUrl: '', rawOriginalUrl: '', target: '', title: '' })}
         />
+      )}
+
+      {/* Floating Toast Notification Banner */}
+      {toastMessage && (
+        <div className="fixed bottom-6 right-6 z-50 animate-bounce-in flex items-center gap-3 px-5 py-3.5 rounded-2xl bg-[#1C1917] text-white shadow-2xl border border-stone-700/80">
+          <div className="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+            <Check className="w-4 h-4" />
+          </div>
+          <span className="text-xs font-semibold text-stone-100">{toastMessage}</span>
+          <button
+            type="button"
+            onClick={() => setToastMessage(null)}
+            className="text-stone-400 hover:text-white ml-1"
+          >
+            <X className="w-3.5 h-3.5" />
+          </button>
+        </div>
       )}
 
     </div>
