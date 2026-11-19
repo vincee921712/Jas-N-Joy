@@ -61,7 +61,7 @@ export const bakeryInfo = {
     subBadge: "Fondant, Buttercream & Pull-outs",
     placeholderText: "[Hero Photo Placeholder: Storefront or Signature Cake Showcase]",
     description: "Reserved for high-resolution photography of Jas 'N Joy's Pueblo de Panay bakeshop display or featured tiered centerpiece.",
-    imageUrl: "",
+    imageUrl: "/wedding-pearl-cake.png",
     imagePosition: "center",
     imageScale: 1,
     imageX: 0,
@@ -135,6 +135,7 @@ export const products = [
     badge: "Ready in Display",
     availability: "Daily Walk-in / Ready-to-Go",
     photoPlaceholder: "[Photo Placeholder: Classic Chocolate Fudge Display Cake]",
+    imageUrl: "/wedding-pearl-cake.png",
     accent: "bg-amber-100 text-amber-900 border-amber-300"
   },
   {
