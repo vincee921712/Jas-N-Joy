@@ -878,13 +878,7 @@ export default function OwnerPortal({
                   </div>
                 </div>
 
-                <div className="pt-3 border-t border-[#F5EBE1] flex items-center justify-end gap-3">
-                  {showcaseSaveNotice && (
-                    <span className="text-xs font-semibold text-emerald-700 flex items-center gap-1.5 animate-fade-in">
-                      <CheckCircle className="w-4 h-4 text-emerald-600" />
-                      Changes saved to storefront!
-                    </span>
-                  )}
+                <div className="pt-3 border-t border-[#F5EBE1] flex items-center justify-end">
                   <button
                     type="submit"
                     className={`px-6 py-3 rounded-full text-white text-xs font-bold shadow-xs hover:shadow transition-all flex items-center gap-2 ${
