@@ -894,7 +894,7 @@ export default function OwnerPortal({
                     }`}
                   >
                     <Check className={`w-4 h-4 ${showcaseSavedButtonState ? 'text-white' : 'text-amber-200'}`} />
-                    <span>{showcaseSavedButtonState ? '✓ Saved Successfully!' : 'Save Showcase Changes'}</span>
+                    <span>{showcaseSavedButtonState ? 'Saved Successfully!' : 'Save Showcase Changes'}</span>
                   </button>
                 </div>
               </form>
