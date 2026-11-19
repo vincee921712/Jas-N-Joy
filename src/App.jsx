@@ -251,12 +251,14 @@ export default function App() {
               </span>
             </button>
             <div>
-              <a href="#" className="block font-serif text-xl sm:text-2xl font-bold tracking-tight text-[#451A03] hover:text-[#92400E] transition-colors">
+              <a href="#" className="block font-serif text-xl sm:text-2xl font-bold tracking-tight text-[#451A03] hover:text-[#92400E] transition-colors leading-tight">
                 {bakeryInfo.brandName}
               </a>
-              <span className="block text-[11px] font-semibold tracking-wider text-[#92400E] uppercase">
-                {bakeryInfo.tagline}
-              </span>
+              <div className="flex items-center gap-1.5 text-[11px] font-semibold tracking-wider text-[#92400E] uppercase">
+                <span>{bakeryInfo.tagline}</span>
+                <span className="text-[#C28251]">•</span>
+                <span className="font-bold text-[#78350F]">Est. 2019</span>
+              </div>
             </div>
           </div>
 
