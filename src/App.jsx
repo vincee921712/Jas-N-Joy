@@ -223,7 +223,17 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#FFFDF9] text-[#2D241E] font-sans selection:bg-amber-200 selection:text-amber-900">
+    <div className="relative min-h-screen flex flex-col bg-[#FFFDF9] text-[#2D241E] font-sans selection:bg-amber-200 selection:text-amber-900">
+      
+      {/* Artisanal Bakery Background Pattern (Watermark behind warm gradient) */}
+      <div 
+        aria-hidden="true"
+        className="fixed inset-0 pointer-events-none z-0 opacity-40 bg-repeat bg-center"
+        style={{
+          backgroundImage: 'url(/bakery-pattern-bg.svg)',
+          backgroundSize: '280px 280px'
+        }}
+      />
       
       {/* 1. Top Announcement Bar: Slot Availability Banner (Dismissible / Sticky) */}
       {!bannerDismissed && (
