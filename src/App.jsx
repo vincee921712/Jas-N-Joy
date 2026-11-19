@@ -508,6 +508,7 @@ export default function App() {
                     <img 
                       src={heroShowcase.imageUrl} 
                       alt="Signature Cake Showcase" 
+                      style={{ objectPosition: heroShowcase.imagePosition || 'center' }}
                       className="w-full h-full object-cover rounded-xl transition-transform duration-500 group-hover:scale-105"
                     />
                   ) : (
@@ -653,6 +654,7 @@ export default function App() {
                         <img 
                           src={product.imageUrl} 
                           alt={product.name} 
+                          style={{ objectPosition: product.imagePosition || 'center' }}
                           className="w-full h-full object-cover rounded-xl transition-transform duration-500 ease-out group-hover:scale-105"
                         />
                       ) : (

@@ -60,7 +60,8 @@ export const bakeryInfo = {
     subBadge: "Fondant, Buttercream & Pull-outs",
     placeholderText: "[Hero Photo Placeholder: Storefront or Signature Cake Showcase]",
     description: "Reserved for high-resolution photography of Jas 'N Joy's Pueblo de Panay bakeshop display or featured tiered centerpiece.",
-    imageUrl: ""
+    imageUrl: "",
+    imagePosition: "center"
   }
 };
 

@@ -53,7 +53,8 @@ export default function OwnerPortal({
     subBadge: heroShowcase?.subBadge || "Fondant, Buttercream & Pull-outs",
     placeholderText: heroShowcase?.placeholderText || "[Hero Photo Placeholder: Storefront or Signature Cake Showcase]",
     description: heroShowcase?.description || "Reserved for high-resolution photography of Jas 'N Joy's Pueblo de Panay bakeshop display or featured tiered centerpiece.",
-    imageUrl: heroShowcase?.imageUrl || ""
+    imageUrl: heroShowcase?.imageUrl || "",
+    imagePosition: heroShowcase?.imagePosition || "center"
   });
   const [showcaseSaveNotice, setShowcaseSaveNotice] = useState(false);
 
@@ -69,6 +70,7 @@ export default function OwnerPortal({
     availability: 'Daily Walk-in / Ready-to-Go',
     photoPlaceholder: '',
     imageUrl: '',
+    imagePosition: 'center',
     isSoldOut: false
   });
 
@@ -101,6 +103,7 @@ export default function OwnerPortal({
       availability: 'Daily Walk-in / Ready-to-Go',
       photoPlaceholder: '',
       imageUrl: '',
+      imagePosition: 'center',
       isSoldOut: false
     });
     setIsProductModalOpen(true);
@@ -117,6 +120,7 @@ export default function OwnerPortal({
       availability: prod.availability || '',
       photoPlaceholder: prod.photoPlaceholder || '',
       imageUrl: prod.imageUrl || '',
+      imagePosition: prod.imagePosition || 'center',
       isSoldOut: !!prod.isSoldOut
     });
     setIsProductModalOpen(true);
@@ -479,6 +483,7 @@ export default function OwnerPortal({
                         <img 
                           src={prod.imageUrl} 
                           alt={prod.name} 
+                          style={{ objectPosition: prod.imagePosition || 'center' }}
                           className="w-full h-full object-cover rounded-xl"
                         />
                       ) : (
@@ -733,17 +738,53 @@ export default function OwnerPortal({
                     </label>
 
                     {showcaseForm.imageUrl ? (
-                      <div className="flex items-center gap-3">
-                        <div className="w-14 h-14 rounded-xl overflow-hidden border border-[#D9C4B2] shadow-2xs">
-                          <img src={showcaseForm.imageUrl} alt="Hero preview" className="w-full h-full object-cover" />
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full pt-1">
+                        <div className="flex items-center gap-3">
+                          <div className="w-16 h-16 rounded-xl overflow-hidden border border-[#D9C4B2] shadow-2xs">
+                            <img 
+                              src={showcaseForm.imageUrl} 
+                              alt="Hero preview" 
+                              style={{ objectPosition: showcaseForm.imagePosition || 'center' }}
+                              className="w-full h-full object-cover" 
+                            />
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => setShowcaseForm({ ...showcaseForm, imageUrl: "" })}
+                            className="text-xs text-rose-700 hover:underline font-semibold"
+                          >
+                            Remove Photo
+                          </button>
                         </div>
-                        <button
-                          type="button"
-                          onClick={() => setShowcaseForm({ ...showcaseForm, imageUrl: "" })}
-                          className="text-xs text-rose-700 hover:underline font-semibold"
-                        >
-                          Remove Photo
-                        </button>
+
+                        {/* Image Placement / Focus Alignment Selector */}
+                        <div className="flex-1 bg-white p-3 rounded-xl border border-[#D9C4B2] w-full">
+                          <span className="block text-[11px] font-bold text-[#451A03] mb-1.5">
+                            Photo Alignment & Focus:
+                          </span>
+                          <div className="grid grid-cols-3 sm:grid-cols-5 gap-1.5 text-[11px]">
+                            {[
+                              { label: 'Center', val: 'center' },
+                              { label: 'Top', val: 'top' },
+                              { label: 'Bottom', val: 'bottom' },
+                              { label: 'Left', val: 'left' },
+                              { label: 'Right', val: 'right' }
+                            ].map((pos) => (
+                              <button
+                                key={pos.val}
+                                type="button"
+                                onClick={() => setShowcaseForm({ ...showcaseForm, imagePosition: pos.val })}
+                                className={`px-2 py-1.5 rounded-lg border font-semibold transition-all ${
+                                  (showcaseForm.imagePosition || 'center') === pos.val
+                                    ? 'bg-[#92400E] text-white border-[#92400E] shadow-2xs'
+                                    : 'bg-[#FFFDF9] text-[#57483D] border-[#D9C4B2] hover:bg-[#FAF2E8]'
+                                }`}
+                              >
+                                {pos.label}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
                       </div>
                     ) : (
                       <span className="text-xs text-[#786C62]">
@@ -761,7 +802,12 @@ export default function OwnerPortal({
                   <div className="max-w-sm mx-auto rounded-3xl p-3 bg-gradient-to-br from-[#F5EBE1] via-[#FFFDF9] to-[#FAF2E8] border border-[#E9D9C9] shadow-sm relative">
                     <div className="w-full aspect-4/3 rounded-2xl bg-[#FFFDF9] border-2 border-dashed border-[#D9C4B2] flex flex-col items-center justify-center p-4 text-center overflow-hidden">
                       {showcaseForm.imageUrl ? (
-                        <img src={showcaseForm.imageUrl} alt="preview" className="w-full h-full object-cover rounded-xl" />
+                        <img 
+                          src={showcaseForm.imageUrl} 
+                          alt="preview" 
+                          style={{ objectPosition: showcaseForm.imagePosition || 'center' }}
+                          className="w-full h-full object-cover rounded-xl transition-all" 
+                        />
                       ) : (
                         <>
                           <ImageIcon className="w-7 h-7 text-[#92400E] mb-2" />
@@ -1141,17 +1187,53 @@ export default function OwnerPortal({
                   </label>
 
                   {productForm.imageUrl && (
-                    <div className="flex items-center gap-2">
-                      <div className="w-9 h-9 rounded-lg overflow-hidden border border-[#D9C4B2]">
-                        <img src={productForm.imageUrl} alt="preview" className="w-full h-full object-cover" />
+                    <div className="flex flex-col gap-2 w-full pt-1">
+                      <div className="flex items-center gap-2">
+                        <div className="w-12 h-12 rounded-lg overflow-hidden border border-[#D9C4B2] shrink-0">
+                          <img 
+                            src={productForm.imageUrl} 
+                            alt="preview" 
+                            style={{ objectPosition: productForm.imagePosition || 'center' }}
+                            className="w-full h-full object-cover" 
+                          />
+                        </div>
+                        <button 
+                          type="button" 
+                          onClick={() => setProductForm({ ...productForm, imageUrl: '' })}
+                          className="text-[11px] text-rose-700 hover:underline font-semibold"
+                        >
+                          Remove Photo
+                        </button>
                       </div>
-                      <button 
-                        type="button" 
-                        onClick={() => setProductForm({ ...productForm, imageUrl: '' })}
-                        className="text-[11px] text-rose-700 hover:underline"
-                      >
-                        Remove
-                      </button>
+
+                      {/* Image Placement / Focus Alignment Selector for Catalog Product */}
+                      <div className="bg-white p-2.5 rounded-xl border border-[#D9C4B2]">
+                        <span className="block text-[11px] font-bold text-[#451A03] mb-1">
+                          Photo Alignment / Focus:
+                        </span>
+                        <div className="grid grid-cols-5 gap-1 text-[11px]">
+                          {[
+                            { label: 'Center', val: 'center' },
+                            { label: 'Top', val: 'top' },
+                            { label: 'Bottom', val: 'bottom' },
+                            { label: 'Left', val: 'left' },
+                            { label: 'Right', val: 'right' }
+                          ].map((pos) => (
+                            <button
+                              key={pos.val}
+                              type="button"
+                              onClick={() => setProductForm({ ...productForm, imagePosition: pos.val })}
+                              className={`px-1.5 py-1 rounded-lg border font-semibold text-center transition-all ${
+                                (productForm.imagePosition || 'center') === pos.val
+                                  ? 'bg-[#92400E] text-white border-[#92400E]'
+                                  : 'bg-[#FFFDF9] text-[#57483D] border-[#D9C4B2] hover:bg-[#FAF2E8]'
+                              }`}
+                            >
+                              {pos.label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
                     </div>
                   )}
                 </div>
