@@ -598,37 +598,37 @@ export default function App() {
             {filteredProducts.map((product) => (
               <div 
                 key={product.id}
-                className={`bg-white rounded-3xl border transition-all overflow-hidden flex flex-col justify-between ${
-                  product.isSoldOut ? 'border-stone-300 opacity-85' : 'border-[#E9D9C9] shadow-xs hover:shadow-md'
+                className={`group bg-white rounded-3xl border transition-all duration-300 ease-out overflow-hidden flex flex-col justify-between hover:scale-[1.03] hover:-translate-y-1 ${
+                  product.isSoldOut ? 'border-stone-300 opacity-85' : 'border-[#E9D9C9] shadow-xs hover:shadow-xl hover:border-amber-300/80'
                 }`}
               >
                 {/* Product Photo Placeholder Frame or Live Image */}
                 <div>
                   <div className="p-4 pb-0">
-                    <div className="relative aspect-4/3 w-full rounded-2xl bg-gradient-to-br from-[#FAF2E8] to-[#FFFDF9] border-2 border-dashed border-[#D9C4B2] flex flex-col items-center justify-center p-4 text-center overflow-hidden">
+                    <div className="relative aspect-4/3 w-full rounded-2xl bg-gradient-to-br from-[#FAF2E8] to-[#FFFDF9] border-2 border-dashed border-[#D9C4B2] flex flex-col items-center justify-center p-4 text-center overflow-hidden transition-all duration-300 group-hover:border-amber-400/80">
                       {product.imageUrl ? (
                         <img 
                           src={product.imageUrl} 
                           alt={product.name} 
-                          className="w-full h-full object-cover rounded-xl"
+                          className="w-full h-full object-cover rounded-xl transition-transform duration-500 ease-out group-hover:scale-105"
                         />
                       ) : (
-                        <>
-                          <ImageIcon className="w-8 h-8 text-[#B45309] mb-2" />
+                        <div className="transition-transform duration-300 group-hover:scale-105">
+                          <ImageIcon className="w-8 h-8 text-[#B45309] mb-2 mx-auto" />
                           <span className="font-mono text-xs font-semibold text-[#78350F] bg-white/90 px-3 py-1 rounded-md border border-[#E9D9C9] shadow-2xs">
                             {product.photoPlaceholder}
                           </span>
-                        </>
+                        </div>
                       )}
 
                       {/* Pill Badges */}
-                      <div className="absolute top-3 right-3 flex flex-col gap-1 items-end">
+                      <div className="absolute top-3 right-3 flex flex-col gap-1 items-end z-10">
                         {product.isSoldOut ? (
                           <span className="text-[10px] font-bold uppercase px-3 py-1 rounded-full bg-stone-800 text-white shadow-2xs">
                             Sold Out Today
                           </span>
                         ) : (
-                          <span className={`text-[11px] font-bold uppercase px-3 py-1 rounded-full border shadow-2xs ${product.accent || 'bg-amber-100 text-amber-900 border-amber-300'}`}>
+                          <span className={`text-[11px] font-bold uppercase px-3 py-1 rounded-full border shadow-2xs transition-transform duration-300 group-hover:scale-105 ${product.accent || 'bg-amber-100 text-amber-900 border-amber-300'}`}>
                             {product.badge}
                           </span>
                         )}
@@ -638,7 +638,7 @@ export default function App() {
 
                   {/* Details */}
                   <div className="p-6 pb-2 space-y-3">
-                    <h3 className="font-serif text-lg sm:text-xl font-bold text-[#451A03] mb-1.5">
+                    <h3 className="font-serif text-lg sm:text-xl font-bold text-[#451A03] mb-1.5 transition-colors duration-200 group-hover:text-[#92400E]">
                       {product.name}
                     </h3>
                     <p className="text-xs sm:text-sm text-[#57483D] leading-relaxed mb-3">
@@ -670,10 +670,10 @@ export default function App() {
                         themeDescription: `Inquiring for: ${product.name} (${product.priceBadge})`
                       }));
                     }}
-                    className={`px-4 py-2 rounded-full text-xs font-semibold transition-colors flex items-center gap-1 shrink-0 ${
+                    className={`px-4 py-2 rounded-full text-xs font-semibold transition-all duration-200 flex items-center gap-1 shrink-0 ${
                       product.isSoldOut
                         ? 'bg-stone-100 text-stone-500 hover:bg-stone-200'
-                        : 'bg-[#F5EBE1] hover:bg-[#EBDCCE] text-[#451A03]'
+                        : 'bg-[#F5EBE1] hover:bg-[#92400E] hover:text-white text-[#451A03] shadow-2xs'
                     }`}
                   >
                     <span>{product.isSoldOut ? 'Inquire Next Batch' : 'Inquire'}</span>
