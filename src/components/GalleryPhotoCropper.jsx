@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { ZoomIn, ZoomOut, RotateCcw, Check, X, Crop, Move } from 'lucide-react';
+import { ZoomIn, ZoomOut, RotateCcw, Check, X, Crop, Move, Lock, Unlock } from 'lucide-react';
 
 /**
  * GalleryPhotoCropper
@@ -8,11 +8,13 @@ import { ZoomIn, ZoomOut, RotateCcw, Check, X, Crop, Move } from 'lucide-react';
  * - Shows the full picture on a dark backdrop
  * - Users can drag the 4 corner handles and 4 edge handles to resize the crop box from ANY side
  * - Users can also drag the crop box itself to reposition it
- * - Users can zoom in/out the photo
- * - Crops via HTML5 canvas and outputs the cropped dataUrl
+ * - Aspect ratio matches the exact storefront card display (default: 4:5 portrait, toggleable to freeform)
+ * - Constrained strictly to the image boundary so you always know what will only fit
+ * - Crops via HTML5 canvas and outputs the high-resolution cropped dataUrl
  */
 export default function GalleryPhotoCropper({ 
   imageUrl, 
+  aspectRatio = 4 / 5, // width / height (matches storefront card display ratio)
   onSaveCroppedImage, 
   onClose,
   title = "Crop & Frame Photo"
@@ -30,7 +32,10 @@ export default function GalleryPhotoCropper({
   // Zoom scale of the image
   const [zoom, setZoom] = useState(1);
 
-  // Active interaction: null | 'move-box' | 'handle-tl' | 'handle-tr' | 'handle-bl' | 'handle-br' | 'handle-t' | 'handle-b' | 'handle-l' | 'handle-r'
+  // Keep display ratio locked to card shape (4:5) so user knows exactly what fits the display photo
+  const [lockRatio, setLockRatio] = useState(true);
+
+  // Active interaction: null | 'move-box' | 'tl' | 'tr' | 'bl' | 'br' | 't' | 'b' | 'l' | 'r'
   const [dragMode, setDragMode] = useState(null);
   const dragStartRef = useRef({ x: 0, y: 0, cropBox: null });
 
@@ -42,9 +47,9 @@ export default function GalleryPhotoCropper({
     const naturalH = imgRef.current.naturalHeight;
     if (!naturalW || !naturalH) return;
 
-    // Available space in container with 24px padding
-    const maxW = container.width - 48;
-    const maxH = container.height - 48;
+    // Available space in container with 32px padding
+    const maxW = container.width - 64;
+    const maxH = container.height - 64;
 
     const imgAspect = naturalW / naturalH;
     let renderedW = maxW;
@@ -68,20 +73,38 @@ export default function GalleryPhotoCropper({
     return layout;
   }, [zoom]);
 
-  // Initial load: compute layout and initialize crop box over 85% of image
+  // Initial load: compute layout and initialize crop box to match card display ratio (4:5)
   const handleImageLoad = () => {
     setImageLoaded(true);
     setTimeout(() => {
       const layout = computeLayout();
       if (layout) {
-        // Initialize crop box nicely centered on the image
-        const boxW = Math.round(layout.width * 0.85);
-        const boxH = Math.round(layout.height * 0.85);
-        const boxLeft = Math.round(layout.left + (layout.width - boxW) / 2);
-        const boxTop = Math.round(layout.top + (layout.height - boxH) / 2);
-        setCropBox({ left: boxLeft, top: boxTop, width: boxW, height: boxH });
+        initCropBox(layout, lockRatio);
       }
     }, 50);
+  };
+
+  const initCropBox = (layout, keepRatio) => {
+    // Fits maximum area inside the image that satisfies aspectRatio (4:5)
+    let boxW, boxH;
+    if (keepRatio && aspectRatio) {
+      boxW = layout.width * 0.9;
+      boxH = boxW / aspectRatio;
+      if (boxH > layout.height * 0.9) {
+        boxH = layout.height * 0.9;
+        boxW = boxH * aspectRatio;
+      }
+    } else {
+      boxW = layout.width * 0.85;
+      boxH = layout.height * 0.85;
+    }
+
+    boxW = Math.round(boxW);
+    boxH = Math.round(boxH);
+    const boxLeft = Math.round(layout.left + (layout.width - boxW) / 2);
+    const boxTop = Math.round(layout.top + (layout.height - boxH) / 2);
+
+    setCropBox({ left: boxLeft, top: boxTop, width: boxW, height: boxH });
   };
 
   useEffect(() => {
@@ -111,6 +134,7 @@ export default function GalleryPhotoCropper({
   };
 
   // Pointer move to adjust sides/corners or move the whole box
+  // Constrained to the image bounds (so you know what will only fit in the photo display)
   const handlePointerMove = useCallback((e) => {
     if (!dragMode || !containerRef.current) return;
     const clientX = e.clientX ?? (e.touches && e.touches[0].clientX);
@@ -121,41 +145,154 @@ export default function GalleryPhotoCropper({
     const dy = clientY - dragStartRef.current.y;
     const orig = dragStartRef.current.cropBox;
 
-    const minSize = 40; // minimum width/height for crop box
+    const minSize = 40; // minimum dimension in px
+
+    // The maximum boundaries are strictly clamped to the actual image layout
+    const imgBoundLeft = imgLayout.left;
+    const imgBoundTop = imgLayout.top;
+    const imgBoundRight = imgLayout.left + imgLayout.width;
+    const imgBoundBottom = imgLayout.top + imgLayout.height;
 
     let newLeft = orig.left;
     let newTop = orig.top;
     let newWidth = orig.width;
     let newHeight = orig.height;
 
-    // Bounds constraint: can crop inside container
-    const cWidth = containerRef.current.clientWidth;
-    const cHeight = containerRef.current.clientHeight;
-
     if (dragMode === 'move-box') {
-      newLeft = Math.max(0, Math.min(orig.left + dx, cWidth - orig.width));
-      newTop = Math.max(0, Math.min(orig.top + dy, cHeight - orig.height));
+      // Reposition inside the image bounds
+      newLeft = Math.max(imgBoundLeft, Math.min(orig.left + dx, imgBoundRight - orig.width));
+      newTop = Math.max(imgBoundTop, Math.min(orig.top + dy, imgBoundBottom - orig.height));
     } else {
-      // Adjust edges/corners
-      if (dragMode.includes('l')) {
-        const proposedLeft = orig.left + dx;
-        const maxLeft = orig.left + orig.width - minSize;
-        newLeft = Math.max(0, Math.min(proposedLeft, maxLeft));
-        newWidth = orig.width - (newLeft - orig.left);
-      }
-      if (dragMode.includes('r')) {
-        const proposedWidth = orig.width + dx;
-        newWidth = Math.max(minSize, Math.min(proposedWidth, cWidth - orig.left));
-      }
-      if (dragMode.includes('t')) {
-        const proposedTop = orig.top + dy;
-        const maxTop = orig.top + orig.height - minSize;
-        newTop = Math.max(0, Math.min(proposedTop, maxTop));
-        newHeight = orig.height - (newTop - orig.top);
-      }
-      if (dragMode.includes('b')) {
-        const proposedHeight = orig.height + dy;
-        newHeight = Math.max(minSize, Math.min(proposedHeight, cHeight - orig.top));
+      // Sizing from edges or corners
+      if (lockRatio && aspectRatio) {
+        // Locked to storefront display ratio (4:5)
+        if (dragMode === 'br') {
+          let w = Math.max(minSize, orig.width + dx);
+          let h = w / aspectRatio;
+          if (orig.left + w > imgBoundRight) {
+            w = imgBoundRight - orig.left;
+            h = w / aspectRatio;
+          }
+          if (orig.top + h > imgBoundBottom) {
+            h = imgBoundBottom - orig.top;
+            w = h * aspectRatio;
+          }
+          newWidth = w;
+          newHeight = h;
+        } else if (dragMode === 'bl') {
+          let w = Math.max(minSize, orig.width - dx);
+          let h = w / aspectRatio;
+          if (orig.left + orig.width - w < imgBoundLeft) {
+            w = orig.left + orig.width - imgBoundLeft;
+            h = w / aspectRatio;
+          }
+          if (orig.top + h > imgBoundBottom) {
+            h = imgBoundBottom - orig.top;
+            w = h * aspectRatio;
+          }
+          newLeft = orig.left + orig.width - w;
+          newWidth = w;
+          newHeight = h;
+        } else if (dragMode === 'tr') {
+          let w = Math.max(minSize, orig.width + dx);
+          let h = w / aspectRatio;
+          if (orig.left + w > imgBoundRight) {
+            w = imgBoundRight - orig.left;
+            h = w / aspectRatio;
+          }
+          if (orig.top + orig.height - h < imgBoundTop) {
+            h = orig.top + orig.height - imgBoundTop;
+            w = h * aspectRatio;
+          }
+          newTop = orig.top + orig.height - h;
+          newWidth = w;
+          newHeight = h;
+        } else if (dragMode === 'tl') {
+          let w = Math.max(minSize, orig.width - dx);
+          let h = w / aspectRatio;
+          if (orig.left + orig.width - w < imgBoundLeft) {
+            w = orig.left + orig.width - imgBoundLeft;
+            h = w / aspectRatio;
+          }
+          if (orig.top + orig.height - h < imgBoundTop) {
+            h = orig.top + orig.height - imgBoundTop;
+            w = h * aspectRatio;
+          }
+          newLeft = orig.left + orig.width - w;
+          newTop = orig.top + orig.height - h;
+          newWidth = w;
+          newHeight = h;
+        } else if (dragMode === 'r' || dragMode === 'l') {
+          // Adjust horizontal side with locked ratio
+          const delta = dragMode === 'r' ? dx : -dx;
+          let w = Math.max(minSize, orig.width + delta);
+          let h = w / aspectRatio;
+          if (dragMode === 'r') {
+            if (orig.left + w > imgBoundRight) {
+              w = imgBoundRight - orig.left;
+              h = w / aspectRatio;
+            }
+          } else {
+            if (orig.left + orig.width - w < imgBoundLeft) {
+              w = orig.left + orig.width - imgBoundLeft;
+              h = w / aspectRatio;
+            }
+            newLeft = orig.left + orig.width - w;
+          }
+          // Center the height adjustment vertically
+          let t = orig.top - (h - orig.height) / 2;
+          if (t < imgBoundTop) t = imgBoundTop;
+          if (t + h > imgBoundBottom) t = imgBoundBottom - h;
+          newTop = t;
+          newWidth = w;
+          newHeight = h;
+        } else if (dragMode === 't' || dragMode === 'b') {
+          // Adjust vertical side with locked ratio
+          const delta = dragMode === 'b' ? dy : -dy;
+          let h = Math.max(minSize, orig.height + delta);
+          let w = h * aspectRatio;
+          if (dragMode === 'b') {
+            if (orig.top + h > imgBoundBottom) {
+              h = imgBoundBottom - orig.top;
+              w = h * aspectRatio;
+            }
+          } else {
+            if (orig.top + orig.height - h < imgBoundTop) {
+              h = orig.top + orig.height - imgBoundTop;
+              w = h * aspectRatio;
+            }
+            newTop = orig.top + orig.height - h;
+          }
+          // Center the width adjustment horizontally
+          let l = orig.left - (w - orig.width) / 2;
+          if (l < imgBoundLeft) l = imgBoundLeft;
+          if (l + w > imgBoundRight) l = imgBoundRight - w;
+          newLeft = l;
+          newWidth = w;
+          newHeight = h;
+        }
+      } else {
+        // Freeform adjustments (unlocked)
+        if (dragMode.includes('l')) {
+          const proposedLeft = orig.left + dx;
+          const maxLeft = orig.left + orig.width - minSize;
+          newLeft = Math.max(imgBoundLeft, Math.min(proposedLeft, maxLeft));
+          newWidth = orig.width - (newLeft - orig.left);
+        }
+        if (dragMode.includes('r')) {
+          const proposedWidth = orig.width + dx;
+          newWidth = Math.max(minSize, Math.min(proposedWidth, imgBoundRight - orig.left));
+        }
+        if (dragMode.includes('t')) {
+          const proposedTop = orig.top + dy;
+          const maxTop = orig.top + orig.height - minSize;
+          newTop = Math.max(imgBoundTop, Math.min(proposedTop, maxTop));
+          newHeight = orig.height - (newTop - orig.top);
+        }
+        if (dragMode.includes('b')) {
+          const proposedHeight = orig.height + dy;
+          newHeight = Math.max(minSize, Math.min(proposedHeight, imgBoundBottom - orig.top));
+        }
       }
     }
 
@@ -165,7 +302,7 @@ export default function GalleryPhotoCropper({
       width: Math.round(newWidth),
       height: Math.round(newHeight)
     });
-  }, [dragMode]);
+  }, [dragMode, lockRatio, aspectRatio, imgLayout]);
 
   const handlePointerUp = () => {
     setDragMode(null);
@@ -230,12 +367,9 @@ export default function GalleryPhotoCropper({
 
   const handleReset = () => {
     setZoom(1);
-    if (imgLayout.width > 0) {
-      const boxW = Math.round(imgLayout.width * 0.85);
-      const boxH = Math.round(imgLayout.height * 0.85);
-      const boxLeft = Math.round(imgLayout.left + (imgLayout.width - boxW) / 2);
-      const boxTop = Math.round(imgLayout.top + (imgLayout.height - boxH) / 2);
-      setCropBox({ left: boxLeft, top: boxTop, width: boxW, height: boxH });
+    const layout = computeLayout();
+    if (layout) {
+      initCropBox(layout, lockRatio);
     }
   };
 
@@ -263,10 +397,15 @@ export default function GalleryPhotoCropper({
           ref={containerRef}
           className="relative w-full h-[380px] sm:h-[460px] bg-[#12100E] overflow-hidden flex items-center justify-center"
         >
-          {/* Instructions Pill */}
-          <div className="absolute top-3 left-3 z-30 pointer-events-none flex items-center gap-2 bg-black/70 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10 text-[11px] text-stone-300">
-            <Move className="w-3 h-3 text-amber-400" />
-            <span>Drag any side or corner to adjust grid • Drag inside to reposition</span>
+          {/* Instructions & Display Fit Notice */}
+          <div className="absolute top-3 left-3 z-30 pointer-events-none flex flex-wrap items-center gap-2">
+            <div className="flex items-center gap-1.5 bg-black/75 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10 text-[11px] text-stone-300">
+              <Move className="w-3 h-3 text-amber-400" />
+              <span>Drag sides/corners to frame • Drag inside to reposition</span>
+            </div>
+            <div className="flex items-center gap-1 bg-amber-500/20 backdrop-blur-md px-2.5 py-1 rounded-full border border-amber-500/30 text-[10px] text-amber-300 font-medium">
+              <span>Card Display Fit: {lockRatio ? 'Exact 4:5 Card Ratio' : 'Freeform Ratio'}</span>
+            </div>
           </div>
 
           {/* Full Image */}
@@ -298,13 +437,13 @@ export default function GalleryPhotoCropper({
                 top: `${cropBox.top}px`,
                 width: `${cropBox.width}px`,
                 height: `${cropBox.height}px`,
-                boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.65)'
+                boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.70)'
               }}
               onPointerDown={(e) => startDrag('move-box', e)}
-              className="cursor-move border-2 border-white/90 z-20"
+              className="cursor-move border-2 border-white z-20"
             >
               {/* Rule-of-Thirds Grid */}
-              <div className="absolute inset-0 grid grid-cols-3 grid-rows-3 pointer-events-none opacity-30">
+              <div className="absolute inset-0 grid grid-cols-3 grid-rows-3 pointer-events-none opacity-35">
                 <div className="border-r border-b border-white" />
                 <div className="border-r border-b border-white" />
                 <div className="border-b border-white" />
@@ -320,66 +459,66 @@ export default function GalleryPhotoCropper({
               {/* Top-Left */}
               <div 
                 onPointerDown={(e) => startDrag('tl', e)}
-                className="absolute -top-3 -left-3 w-7 h-7 cursor-nwse-resize z-30 flex items-start justify-start p-1"
+                className="absolute -top-3 -left-3 w-8 h-8 cursor-nwse-resize z-30 flex items-start justify-start p-1"
               >
-                <div className="w-5 h-5 border-t-4 border-l-4 border-white shadow-xs" />
+                <div className="w-5 h-5 border-t-4 border-l-4 border-white shadow-md" />
               </div>
 
               {/* Top-Right */}
               <div 
                 onPointerDown={(e) => startDrag('tr', e)}
-                className="absolute -top-3 -right-3 w-7 h-7 cursor-nesw-resize z-30 flex items-start justify-end p-1"
+                className="absolute -top-3 -right-3 w-8 h-8 cursor-nesw-resize z-30 flex items-start justify-end p-1"
               >
-                <div className="w-5 h-5 border-t-4 border-r-4 border-white shadow-xs" />
+                <div className="w-5 h-5 border-t-4 border-r-4 border-white shadow-md" />
               </div>
 
               {/* Bottom-Left */}
               <div 
                 onPointerDown={(e) => startDrag('bl', e)}
-                className="absolute -bottom-3 -left-3 w-7 h-7 cursor-nesw-resize z-30 flex items-end justify-start p-1"
+                className="absolute -bottom-3 -left-3 w-8 h-8 cursor-nesw-resize z-30 flex items-end justify-start p-1"
               >
-                <div className="w-5 h-5 border-b-4 border-l-4 border-white shadow-xs" />
+                <div className="w-5 h-5 border-b-4 border-l-4 border-white shadow-md" />
               </div>
 
               {/* Bottom-Right */}
               <div 
                 onPointerDown={(e) => startDrag('br', e)}
-                className="absolute -bottom-3 -right-3 w-7 h-7 cursor-nwse-resize z-30 flex items-end justify-end p-1"
+                className="absolute -bottom-3 -right-3 w-8 h-8 cursor-nwse-resize z-30 flex items-end justify-end p-1"
               >
-                <div className="w-5 h-5 border-b-4 border-r-4 border-white shadow-xs" />
+                <div className="w-5 h-5 border-b-4 border-r-4 border-white shadow-md" />
               </div>
 
               {/* 4 EDGE HANDLES (Center bar notches for adjusting each side individually) */}
               {/* Top Side */}
               <div 
                 onPointerDown={(e) => startDrag('t', e)}
-                className="absolute -top-3 left-1/2 -translate-x-1/2 w-14 h-6 cursor-ns-resize z-30 flex items-center justify-center"
+                className="absolute -top-3 left-1/2 -translate-x-1/2 w-16 h-6 cursor-ns-resize z-30 flex items-center justify-center"
               >
-                <div className="w-8 h-1.5 bg-white rounded-full shadow-xs" />
+                <div className="w-9 h-2 bg-white rounded-full shadow-md" />
               </div>
 
               {/* Bottom Side */}
               <div 
                 onPointerDown={(e) => startDrag('b', e)}
-                className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-14 h-6 cursor-ns-resize z-30 flex items-center justify-center"
+                className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-16 h-6 cursor-ns-resize z-30 flex items-center justify-center"
               >
-                <div className="w-8 h-1.5 bg-white rounded-full shadow-xs" />
+                <div className="w-9 h-2 bg-white rounded-full shadow-md" />
               </div>
 
               {/* Left Side */}
               <div 
                 onPointerDown={(e) => startDrag('l', e)}
-                className="absolute top-1/2 -left-3 -translate-y-1/2 w-6 h-14 cursor-ew-resize z-30 flex items-center justify-center"
+                className="absolute top-1/2 -left-3 -translate-y-1/2 w-6 h-16 cursor-ew-resize z-30 flex items-center justify-center"
               >
-                <div className="w-1.5 h-8 bg-white rounded-full shadow-xs" />
+                <div className="w-2 h-9 bg-white rounded-full shadow-md" />
               </div>
 
               {/* Right Side */}
               <div 
                 onPointerDown={(e) => startDrag('r', e)}
-                className="absolute top-1/2 -right-3 -translate-y-1/2 w-6 h-14 cursor-ew-resize z-30 flex items-center justify-center"
+                className="absolute top-1/2 -right-3 -translate-y-1/2 w-6 h-16 cursor-ew-resize z-30 flex items-center justify-center"
               >
-                <div className="w-1.5 h-8 bg-white rounded-full shadow-xs" />
+                <div className="w-2 h-9 bg-white rounded-full shadow-md" />
               </div>
 
             </div>
@@ -388,10 +527,10 @@ export default function GalleryPhotoCropper({
 
         {/* Toolbar & Controls */}
         <div className="p-4 bg-[#1C1917] border-t border-stone-800 space-y-3">
-          <div className="flex items-center justify-between gap-4">
+          <div className="flex flex-wrap items-center justify-between gap-3">
             
             {/* Zoom Slider */}
-            <div className="flex items-center gap-2 flex-1 max-w-sm">
+            <div className="flex items-center gap-2 flex-1 min-w-[220px] max-w-sm">
               <button
                 type="button"
                 onClick={() => setZoom(z => Math.max(0.7, Math.round((z - 0.1) * 100) / 100))}
@@ -425,21 +564,43 @@ export default function GalleryPhotoCropper({
               </span>
             </div>
 
-            {/* Reset */}
-            <button
-              type="button"
-              onClick={handleReset}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-stone-800 hover:bg-stone-700 text-xs font-medium text-stone-300 transition-colors"
-            >
-              <RotateCcw className="w-3.5 h-3.5 text-stone-400" />
-              <span>Reset</span>
-            </button>
+            {/* Display Ratio Lock & Reset Buttons */}
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  const newLocked = !lockRatio;
+                  setLockRatio(newLocked);
+                  if (newLocked && imgLayout.width > 0) {
+                    initCropBox(imgLayout, true);
+                  }
+                }}
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-medium transition-colors ${
+                  lockRatio 
+                    ? 'bg-amber-500/20 text-amber-300 border-amber-500/40' 
+                    : 'bg-stone-800 text-stone-300 border-stone-700 hover:bg-stone-700'
+                }`}
+                title={lockRatio ? "Lock to 4:5 display photo ratio" : "Unlock for freeform ratio"}
+              >
+                {lockRatio ? <Lock className="w-3.5 h-3.5" /> : <Unlock className="w-3.5 h-3.5" />}
+                <span>{lockRatio ? 'Card Fit Locked (4:5)' : 'Freeform'}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleReset}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-stone-800 hover:bg-stone-700 text-xs font-medium text-stone-300 transition-colors"
+              >
+                <RotateCcw className="w-3.5 h-3.5 text-stone-400" />
+                <span>Reset</span>
+              </button>
+            </div>
           </div>
 
           {/* Action Buttons */}
           <div className="pt-2 border-t border-stone-800 flex items-center justify-between">
             <span className="text-[11px] text-stone-400">
-              Drag corners & edges to adjust framing
+              Only what's inside the grid will be displayed in the card
             </span>
 
             <div className="flex items-center gap-2">
