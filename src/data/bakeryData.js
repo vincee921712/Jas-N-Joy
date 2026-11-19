@@ -57,11 +57,11 @@ export const bakeryInfo = {
   },
 
   heroShowcase: {
-    badge: "Bespoke Theme Cakes",
-    subBadge: "Fondant, Buttercream & Pull-outs",
+    badge: "Classic Ivory Pearl Wedding Cake",
+    subBadge: "Custom Wedding & Occasion Cakes",
     placeholderText: "[Hero Photo Placeholder: Storefront or Signature Cake Showcase]",
-    description: "Reserved for high-resolution photography of Jas 'N Joy's Pueblo de Panay bakeshop display or featured tiered centerpiece.",
-    imageUrl: "/wedding-pearl-cake.png",
+    description: "An elegant 3-tiered handcrafted centerpiece draped in smooth ivory satin buttercream, cascading sugar pearls, white sugar roses, and golden topper accents.",
+    imageUrl: "/cake-ivory-pearl-wedding.jpg",
     imagePosition: "center",
     imageScale: 1,
     imageX: 0,
@@ -185,7 +185,7 @@ export const products = [
     badge: "Past Featured Theme",
     availability: "3–5 Days Advance Order",
     photoPlaceholder: "[Photo Placeholder: Luxury Designer Bag Cake]",
-    imageUrl: "/wedding-pearl-cake.png",
+    imageUrl: "/cake-designer-bag.jpg",
     accent: "bg-rose-100 text-rose-900 border-rose-300"
   },
   {
