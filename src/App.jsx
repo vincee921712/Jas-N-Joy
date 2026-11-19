@@ -196,21 +196,21 @@ export default function App() {
       {!bannerDismissed && (
         <aside 
           aria-label="Slot Availability Announcement"
-          className="sticky top-0 z-50 bg-[#78350F] text-[#FEF3C7] border-b border-amber-900/40 px-3 sm:px-4 py-2.5 text-xs sm:text-sm font-medium shadow-sm transition-all"
+          className="sticky top-0 z-50 bg-[#F3DBBE] text-[#451A03] border-b border-[#E3C6A2] px-3 sm:px-4 py-2.5 text-xs sm:text-sm font-medium shadow-xs transition-all"
         >
           <div className="max-w-7xl mx-auto flex items-center justify-between gap-2 sm:gap-3">
             <div className="flex items-center gap-2 flex-1 min-w-0">
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-600/60 border border-amber-400/40 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-amber-100 shrink-0">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#92400E] text-white text-[10px] sm:text-[11px] font-bold uppercase tracking-wider shrink-0 shadow-2xs">
                 <Sparkles className="w-3 sm:w-3.5 h-3 sm:h-3.5 text-amber-200" />
                 {announcement.badge || "Slot Notice"}
               </span>
-              <p className="text-left leading-tight text-xs sm:text-sm truncate sm:overflow-visible sm:whitespace-normal">
+              <p className="text-left leading-tight text-xs sm:text-sm font-semibold truncate sm:overflow-visible sm:whitespace-normal text-[#451A03]">
                 {announcement.text}
               </p>
             </div>
             <button 
               onClick={() => setBannerDismissed(true)}
-              className="text-amber-300 hover:text-white p-1 rounded-md hover:bg-amber-800/80 transition-colors shrink-0"
+              className="text-[#78350F] hover:text-[#451A03] p-1 rounded-md hover:bg-[#E8CAAA]/70 transition-colors shrink-0"
               aria-label="Dismiss Announcement"
             >
               <X className="w-4 h-4" />

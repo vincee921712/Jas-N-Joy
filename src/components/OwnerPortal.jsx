@@ -685,12 +685,12 @@ export default function OwnerPortal({
                   <span className="block text-[11px] uppercase font-bold tracking-wider text-[#786C62] mb-1.5">
                     Storefront Live Preview:
                   </span>
-                  <div className="bg-[#78350F] text-[#FEF3C7] rounded-2xl p-4 text-xs font-medium flex items-center justify-between gap-3 shadow-xs">
+                  <div className="bg-[#F3DBBE] text-[#451A03] border border-[#E3C6A2] rounded-2xl p-4 text-xs font-medium flex items-center justify-between gap-3 shadow-xs">
                     <div className="flex items-center gap-2">
-                      <span className="px-2 py-0.5 rounded-full bg-amber-600/60 border border-amber-400/40 text-[10px] font-bold uppercase tracking-wider text-amber-100">
+                      <span className="px-2.5 py-0.5 rounded-full bg-[#92400E] text-white text-[10px] font-bold uppercase tracking-wider shadow-2xs">
                         {slotStatus === 'open' ? 'Custom Cake Slots Open' : slotStatus === 'full' ? 'Fully Booked Today' : 'Slot Availability Notice'}
                       </span>
-                      <span>{slotText}</span>
+                      <span className="font-semibold text-[#451A03]">{slotText}</span>
                     </div>
                   </div>
                 </div>
