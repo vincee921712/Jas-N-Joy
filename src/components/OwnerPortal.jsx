@@ -25,7 +25,8 @@ import {
   ChevronRight,
   ShieldCheck,
   ZoomIn,
-  ZoomOut
+  ZoomOut,
+  Move
 } from 'lucide-react';
 import { bakeryInfo, categories } from '../data/bakeryData';
 
@@ -57,7 +58,9 @@ export default function OwnerPortal({
     description: heroShowcase?.description || "Reserved for high-resolution photography of Jas 'N Joy's Pueblo de Panay bakeshop display or featured tiered centerpiece.",
     imageUrl: heroShowcase?.imageUrl || "",
     imagePosition: heroShowcase?.imagePosition || "center",
-    imageScale: heroShowcase?.imageScale || 1
+    imageScale: heroShowcase?.imageScale || 1,
+    imageX: heroShowcase?.imageX || 0,
+    imageY: heroShowcase?.imageY || 0
   });
   const [showcaseSaveNotice, setShowcaseSaveNotice] = useState(false);
 
@@ -75,6 +78,8 @@ export default function OwnerPortal({
     imageUrl: '',
     imagePosition: 'center',
     imageScale: 1,
+    imageX: 0,
+    imageY: 0,
     isSoldOut: false
   });
 
@@ -109,6 +114,8 @@ export default function OwnerPortal({
       imageUrl: '',
       imagePosition: 'center',
       imageScale: 1,
+      imageX: 0,
+      imageY: 0,
       isSoldOut: false
     });
     setIsProductModalOpen(true);
@@ -127,6 +134,8 @@ export default function OwnerPortal({
       imageUrl: prod.imageUrl || '',
       imagePosition: prod.imagePosition || 'center',
       imageScale: prod.imageScale || 1,
+      imageX: prod.imageX || 0,
+      imageY: prod.imageY || 0,
       isSoldOut: !!prod.isSoldOut
     });
     setIsProductModalOpen(true);
@@ -489,8 +498,12 @@ export default function OwnerPortal({
                         <img 
                           src={prod.imageUrl} 
                           alt={prod.name} 
-                          style={{ objectPosition: prod.imagePosition || 'center' }}
-                          className="w-full h-full object-cover rounded-xl"
+                          style={{ 
+                            objectPosition: prod.imagePosition || 'center',
+                            transform: `translate(${prod.imageX || 0}%, ${prod.imageY || 0}%) scale(${prod.imageScale || 1})`,
+                            transformOrigin: 'center center'
+                          }}
+                          className="w-full h-full object-cover rounded-xl transition-all"
                         />
                       ) : (
                         <div className="text-center p-4">
@@ -751,7 +764,7 @@ export default function OwnerPortal({
                               src={showcaseForm.imageUrl} 
                               alt="Hero preview" 
                               style={{ 
-                                transform: `scale(${showcaseForm.imageScale || 1})`,
+                                transform: `translate(${showcaseForm.imageX || 0}%, ${showcaseForm.imageY || 0}%) scale(${showcaseForm.imageScale || 1})`,
                                 transformOrigin: 'center center'
                               }}
                               className="w-full h-full object-cover transition-transform" 
@@ -766,56 +779,109 @@ export default function OwnerPortal({
                           </button>
                         </div>
 
-                        {/* Interactive Photo Zoom Controls */}
-                        <div className="flex-1 bg-white p-3 rounded-xl border border-[#D9C4B2] w-full">
-                          <div className="flex items-center justify-between mb-1.5">
-                            <span className="text-[11px] font-bold text-[#451A03] flex items-center gap-1.5">
-                              <ZoomIn className="w-3.5 h-3.5 text-[#92400E]" />
-                              Photo Crop / Zoom Scale:
-                            </span>
-                            <span className="text-[11px] font-mono font-bold text-[#92400E] bg-[#FAF2E8] px-2 py-0.5 rounded border border-[#E9D9C9]">
-                              {Math.round((showcaseForm.imageScale || 1) * 100)}%
-                            </span>
+                        {/* Interactive Photo Zoom & Placement Controls */}
+                        <div className="flex-1 bg-white p-3 rounded-xl border border-[#D9C4B2] w-full space-y-2.5">
+                          <div>
+                            <div className="flex items-center justify-between mb-1.5">
+                              <span className="text-[11px] font-bold text-[#451A03] flex items-center gap-1.5">
+                                <ZoomIn className="w-3.5 h-3.5 text-[#92400E]" />
+                                Photo Zoom Scale:
+                              </span>
+                              <span className="text-[11px] font-mono font-bold text-[#92400E] bg-[#FAF2E8] px-2 py-0.5 rounded border border-[#E9D9C9]">
+                                {Math.round((showcaseForm.imageScale || 1) * 100)}%
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <button
+                                type="button"
+                                title="Zoom out"
+                                onClick={() => setShowcaseForm(prev => ({ 
+                                  ...prev, 
+                                  imageScale: Math.max(1, Math.round(((prev.imageScale || 1) - 0.1) * 100) / 100)
+                                }))}
+                                className="w-7 h-7 rounded-lg border border-[#D9C4B2] bg-[#FFFDF9] hover:bg-[#FAF2E8] flex items-center justify-center text-[#57483D] font-bold text-xs transition-colors shrink-0"
+                              >
+                                <ZoomOut className="w-3.5 h-3.5" />
+                              </button>
+                              <input
+                                type="range"
+                                min="1"
+                                max="2.5"
+                                step="0.05"
+                                value={showcaseForm.imageScale || 1}
+                                onChange={(e) => setShowcaseForm(prev => ({ ...prev, imageScale: parseFloat(e.target.value) }))}
+                                className="w-full accent-[#92400E] cursor-pointer"
+                              />
+                              <button
+                                type="button"
+                                title="Zoom in"
+                                onClick={() => setShowcaseForm(prev => ({ 
+                                  ...prev, 
+                                  imageScale: Math.min(2.5, Math.round(((prev.imageScale || 1) + 0.1) * 100) / 100)
+                                }))}
+                                className="w-7 h-7 rounded-lg border border-[#D9C4B2] bg-[#FFFDF9] hover:bg-[#FAF2E8] flex items-center justify-center text-[#57483D] font-bold text-xs transition-colors shrink-0"
+                              >
+                                <ZoomIn className="w-3.5 h-3.5" />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setShowcaseForm(prev => ({ ...prev, imageScale: 1, imageX: 0, imageY: 0 }))}
+                                className="text-[10px] text-stone-500 hover:text-stone-800 underline font-medium ml-1 shrink-0"
+                              >
+                                Reset All
+                              </button>
+                            </div>
                           </div>
-                          <div className="flex items-center gap-2">
-                            <button
-                              type="button"
-                              title="Zoom out"
-                              onClick={() => setShowcaseForm(prev => ({ 
-                                ...prev, 
-                                imageScale: Math.max(1, Math.round(((prev.imageScale || 1) - 0.1) * 100) / 100)
-                              }))}
-                              className="w-7 h-7 rounded-lg border border-[#D9C4B2] bg-[#FFFDF9] hover:bg-[#FAF2E8] flex items-center justify-center text-[#57483D] font-bold text-xs transition-colors shrink-0"
-                            >
-                              <ZoomOut className="w-3.5 h-3.5" />
-                            </button>
-                            <input
-                              type="range"
-                              min="1"
-                              max="2.5"
-                              step="0.05"
-                              value={showcaseForm.imageScale || 1}
-                              onChange={(e) => setShowcaseForm(prev => ({ ...prev, imageScale: parseFloat(e.target.value) }))}
-                              className="w-full accent-[#92400E] cursor-pointer"
-                            />
-                            <button
-                              type="button"
-                              title="Zoom in"
-                              onClick={() => setShowcaseForm(prev => ({ 
-                                ...prev, 
-                                imageScale: Math.min(2.5, Math.round(((prev.imageScale || 1) + 0.1) * 100) / 100)
-                              }))}
-                              className="w-7 h-7 rounded-lg border border-[#D9C4B2] bg-[#FFFDF9] hover:bg-[#FAF2E8] flex items-center justify-center text-[#57483D] font-bold text-xs transition-colors shrink-0"
-                            >
-                              <ZoomIn className="w-3.5 h-3.5" />
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => setShowcaseForm(prev => ({ ...prev, imageScale: 1 }))}
-                              className="text-[10px] text-stone-500 hover:text-stone-800 underline font-medium ml-1 shrink-0"
-                            >
-                              Reset
-                            </button>
+
+                          {/* Pan / Placement Alignment Controls (Active when zoomed or to frame) */}
+                          <div className="pt-2 border-t border-[#F5EBE1]">
+                            <div className="flex items-center justify-between mb-1.5">
+                              <span className="text-[11px] font-bold text-[#451A03] flex items-center gap-1.5">
+                                <Move className="w-3.5 h-3.5 text-[#92400E]" />
+                                Adjust Position (Pan / Placement):
+                              </span>
+                              {(showcaseForm.imageX !== 0 || showcaseForm.imageY !== 0) && (
+                                <button
+                                  type="button"
+                                  onClick={() => setShowcaseForm(prev => ({ ...prev, imageX: 0, imageY: 0 }))}
+                                  className="text-[10px] text-stone-500 hover:text-stone-800 underline font-medium"
+                                >
+                                  Center Position
+                                </button>
+                              )}
+                            </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[10px]">
+                              <div>
+                                <div className="flex justify-between text-[#786C62] mb-0.5 font-medium">
+                                  <span>Horizontal (Left / Right):</span>
+                                  <span className="font-mono">{showcaseForm.imageX || 0}%</span>
+                                </div>
+                                <input
+                                  type="range"
+                                  min="-40"
+                                  max="40"
+                                  step="2"
+                                  value={showcaseForm.imageX || 0}
+                                  onChange={(e) => setShowcaseForm(prev => ({ ...prev, imageX: parseInt(e.target.value, 10) }))}
+                                  className="w-full accent-[#92400E] cursor-pointer"
+                                />
+                              </div>
+                              <div>
+                                <div className="flex justify-between text-[#786C62] mb-0.5 font-medium">
+                                  <span>Vertical (Up / Down):</span>
+                                  <span className="font-mono">{showcaseForm.imageY || 0}%</span>
+                                </div>
+                                <input
+                                  type="range"
+                                  min="-40"
+                                  max="40"
+                                  step="2"
+                                  value={showcaseForm.imageY || 0}
+                                  onChange={(e) => setShowcaseForm(prev => ({ ...prev, imageY: parseInt(e.target.value, 10) }))}
+                                  className="w-full accent-[#92400E] cursor-pointer"
+                                />
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -839,7 +905,7 @@ export default function OwnerPortal({
                           src={showcaseForm.imageUrl} 
                           alt="preview" 
                           style={{ 
-                            transform: `scale(${showcaseForm.imageScale || 1})`,
+                            transform: `translate(${showcaseForm.imageX || 0}%, ${showcaseForm.imageY || 0}%) scale(${showcaseForm.imageScale || 1})`,
                             transformOrigin: 'center center'
                           }}
                           className="w-full h-full object-cover rounded-xl transition-all" 
@@ -1230,7 +1296,7 @@ export default function OwnerPortal({
                             src={productForm.imageUrl} 
                             alt="preview" 
                             style={{ 
-                              transform: `scale(${productForm.imageScale || 1})`,
+                              transform: `translate(${productForm.imageX || 0}%, ${productForm.imageY || 0}%) scale(${productForm.imageScale || 1})`,
                               transformOrigin: 'center center'
                             }}
                             className="w-full h-full object-cover transition-transform" 
@@ -1245,56 +1311,109 @@ export default function OwnerPortal({
                         </button>
                       </div>
 
-                      {/* Photo Crop / Zoom Scale Controls for Catalog Product */}
-                      <div className="bg-white p-2.5 rounded-xl border border-[#D9C4B2]">
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="text-[11px] font-bold text-[#451A03] flex items-center gap-1">
-                            <ZoomIn className="w-3 h-3 text-[#92400E]" />
-                            Photo Zoom / Crop Scale:
-                          </span>
-                          <span className="text-[10px] font-mono font-bold text-[#92400E] bg-[#FAF2E8] px-1.5 py-0.5 rounded border border-[#E9D9C9]">
-                            {Math.round((productForm.imageScale || 1) * 100)}%
-                          </span>
+                      {/* Photo Crop / Zoom & Placement Scale Controls for Catalog Product */}
+                      <div className="bg-white p-2.5 rounded-xl border border-[#D9C4B2] space-y-2">
+                        <div>
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="text-[11px] font-bold text-[#451A03] flex items-center gap-1">
+                              <ZoomIn className="w-3 h-3 text-[#92400E]" />
+                              Photo Zoom Scale:
+                            </span>
+                            <span className="text-[10px] font-mono font-bold text-[#92400E] bg-[#FAF2E8] px-1.5 py-0.5 rounded border border-[#E9D9C9]">
+                              {Math.round((productForm.imageScale || 1) * 100)}%
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <button
+                              type="button"
+                              title="Zoom out"
+                              onClick={() => setProductForm(prev => ({ 
+                                ...prev, 
+                                imageScale: Math.max(1, Math.round(((prev.imageScale || 1) - 0.1) * 100) / 100)
+                              }))}
+                              className="w-6 h-6 rounded-lg border border-[#D9C4B2] bg-[#FFFDF9] hover:bg-[#FAF2E8] flex items-center justify-center text-[#57483D] font-bold text-xs transition-colors shrink-0"
+                            >
+                              <ZoomOut className="w-3 h-3" />
+                            </button>
+                            <input
+                              type="range"
+                              min="1"
+                              max="2.5"
+                              step="0.05"
+                              value={productForm.imageScale || 1}
+                              onChange={(e) => setProductForm(prev => ({ ...prev, imageScale: parseFloat(e.target.value) }))}
+                              className="w-full accent-[#92400E] cursor-pointer"
+                            />
+                            <button
+                              type="button"
+                              title="Zoom in"
+                              onClick={() => setProductForm(prev => ({ 
+                                ...prev, 
+                                imageScale: Math.min(2.5, Math.round(((prev.imageScale || 1) + 0.1) * 100) / 100)
+                              }))}
+                              className="w-6 h-6 rounded-lg border border-[#D9C4B2] bg-[#FFFDF9] hover:bg-[#FAF2E8] flex items-center justify-center text-[#57483D] font-bold text-xs transition-colors shrink-0"
+                            >
+                              <ZoomIn className="w-3 h-3" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setProductForm(prev => ({ ...prev, imageScale: 1, imageX: 0, imageY: 0 }))}
+                              className="text-[10px] text-stone-500 hover:text-stone-800 underline font-medium ml-1 shrink-0"
+                            >
+                              Reset
+                            </button>
+                          </div>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <button
-                            type="button"
-                            title="Zoom out"
-                            onClick={() => setProductForm(prev => ({ 
-                              ...prev, 
-                              imageScale: Math.max(1, Math.round(((prev.imageScale || 1) - 0.1) * 100) / 100)
-                            }))}
-                            className="w-6 h-6 rounded-lg border border-[#D9C4B2] bg-[#FFFDF9] hover:bg-[#FAF2E8] flex items-center justify-center text-[#57483D] font-bold text-xs transition-colors shrink-0"
-                          >
-                            <ZoomOut className="w-3 h-3" />
-                          </button>
-                          <input
-                            type="range"
-                            min="1"
-                            max="2.5"
-                            step="0.05"
-                            value={productForm.imageScale || 1}
-                            onChange={(e) => setProductForm(prev => ({ ...prev, imageScale: parseFloat(e.target.value) }))}
-                            className="w-full accent-[#92400E] cursor-pointer"
-                          />
-                          <button
-                            type="button"
-                            title="Zoom in"
-                            onClick={() => setProductForm(prev => ({ 
-                              ...prev, 
-                              imageScale: Math.min(2.5, Math.round(((prev.imageScale || 1) + 0.1) * 100) / 100)
-                            }))}
-                            className="w-6 h-6 rounded-lg border border-[#D9C4B2] bg-[#FFFDF9] hover:bg-[#FAF2E8] flex items-center justify-center text-[#57483D] font-bold text-xs transition-colors shrink-0"
-                          >
-                            <ZoomIn className="w-3 h-3" />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setProductForm(prev => ({ ...prev, imageScale: 1 }))}
-                            className="text-[10px] text-stone-500 hover:text-stone-800 underline font-medium ml-1 shrink-0"
-                          >
-                            Reset
-                          </button>
+
+                        {/* Position Adjustment Sliders */}
+                        <div className="pt-2 border-t border-[#F5EBE1]">
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="text-[10px] font-bold text-[#451A03] flex items-center gap-1">
+                              <Move className="w-3 h-3 text-[#92400E]" />
+                              Adjust Placement (Pan):
+                            </span>
+                            {(productForm.imageX !== 0 || productForm.imageY !== 0) && (
+                              <button
+                                type="button"
+                                onClick={() => setProductForm(prev => ({ ...prev, imageX: 0, imageY: 0 }))}
+                                className="text-[9px] text-stone-500 hover:text-stone-800 underline font-medium"
+                              >
+                                Center
+                              </button>
+                            )}
+                          </div>
+                          <div className="grid grid-cols-2 gap-2 text-[9px]">
+                            <div>
+                              <div className="flex justify-between text-[#786C62] mb-0.5">
+                                <span>Left / Right:</span>
+                                <span className="font-mono">{productForm.imageX || 0}%</span>
+                              </div>
+                              <input
+                                type="range"
+                                min="-40"
+                                max="40"
+                                step="2"
+                                value={productForm.imageX || 0}
+                                onChange={(e) => setProductForm(prev => ({ ...prev, imageX: parseInt(e.target.value, 10) }))}
+                                className="w-full accent-[#92400E] cursor-pointer"
+                              />
+                            </div>
+                            <div>
+                              <div className="flex justify-between text-[#786C62] mb-0.5">
+                                <span>Up / Down:</span>
+                                <span className="font-mono">{productForm.imageY || 0}%</span>
+                              </div>
+                              <input
+                                type="range"
+                                min="-40"
+                                max="40"
+                                step="2"
+                                value={productForm.imageY || 0}
+                                onChange={(e) => setProductForm(prev => ({ ...prev, imageY: parseInt(e.target.value, 10) }))}
+                                className="w-full accent-[#92400E] cursor-pointer"
+                              />
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>
