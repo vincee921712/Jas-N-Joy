@@ -135,7 +135,7 @@ export const products = [
     badge: "Ready in Display",
     availability: "Daily Walk-in / Ready-to-Go",
     photoPlaceholder: "[Photo Placeholder: Classic Chocolate Fudge Display Cake]",
-    imageUrl: "/wedding-pearl-cake.png",
+    imageUrl: "/cake-chocolate-fudge.jpg",
     accent: "bg-amber-100 text-amber-900 border-amber-300"
   },
   {
