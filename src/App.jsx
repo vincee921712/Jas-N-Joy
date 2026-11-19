@@ -503,7 +503,7 @@ export default function App() {
             {/* Right Hero Image / Signature Cake Showcase Frame */}
             <div className="lg:col-span-5">
               <div className="relative rounded-3xl p-3 bg-gradient-to-br from-[#F5EBE1] via-[#FFFDF9] to-[#FAF2E8] border border-[#E9D9C9] shadow-lg">
-                <div className="w-full aspect-4/3 rounded-2xl bg-[#FFFDF9] border-2 border-dashed border-[#D9C4B2] flex flex-col items-center justify-center p-6 text-center group overflow-hidden">
+                <div className="w-full aspect-[5/4] rounded-2xl bg-[#FFFDF9] border-2 border-dashed border-[#D9C4B2] flex flex-col items-center justify-center p-6 text-center group overflow-hidden">
                   {heroShowcase?.imageUrl ? (
                     <img 
                       src={heroShowcase.imageUrl} 
@@ -589,7 +589,7 @@ export default function App() {
             {/* Storefront / Baker Photo Placeholder Frame */}
             <div className="lg:col-span-5">
               <div className="p-4 rounded-3xl bg-[#FAF2E8] border border-[#E9D9C9] shadow-sm">
-                <div className="aspect-4/3 w-full rounded-2xl bg-white border-2 border-dashed border-[#D9C4B2] flex flex-col items-center justify-center p-6 text-center">
+                <div className="aspect-[5/4] w-full rounded-2xl bg-white border-2 border-dashed border-[#D9C4B2] flex flex-col items-center justify-center p-6 text-center">
                   <div className="w-14 h-14 rounded-2xl bg-[#FDF6ED] flex items-center justify-center text-[#92400E] mb-3">
                     <ImageIcon className="w-7 h-7" />
                   </div>
@@ -653,7 +653,7 @@ export default function App() {
                 {/* Product Photo Placeholder Frame or Live Image */}
                 <div>
                   <div className="p-4 pb-0">
-                    <div className="relative aspect-4/3 w-full rounded-2xl bg-gradient-to-br from-[#FAF2E8] to-[#FFFDF9] border-2 border-dashed border-[#D9C4B2] flex flex-col items-center justify-center p-4 text-center overflow-hidden transition-all duration-300 group-hover:border-amber-400/80">
+                    <div className="relative aspect-[5/4] w-full rounded-2xl bg-gradient-to-br from-[#FAF2E8] to-[#FFFDF9] border-2 border-dashed border-[#D9C4B2] flex flex-col items-center justify-center p-4 text-center overflow-hidden transition-all duration-300 group-hover:border-amber-400/80">
                       {product.imageUrl ? (
                         <img 
                           src={product.imageUrl} 
@@ -1178,7 +1178,7 @@ export default function App() {
             {/* Map & Storefront Photo Placeholder Frame */}
             <div className="lg:col-span-6 space-y-4">
               <div className="bg-white rounded-3xl border border-[#E9D9C9] p-4 shadow-xs">
-                <div className="aspect-16/10 w-full rounded-2xl bg-[#FFFDF9] border-2 border-dashed border-[#D9C4B2] flex flex-col items-center justify-center p-6 text-center">
+                <div className="aspect-[16/11] w-full rounded-2xl bg-[#FFFDF9] border-2 border-dashed border-[#D9C4B2] flex flex-col items-center justify-center p-6 text-center">
                   <div className="w-14 h-14 rounded-2xl bg-[#FAF2E8] flex items-center justify-center text-[#92400E] mb-3">
                     <Compass className="w-7 h-7" />
                   </div>
