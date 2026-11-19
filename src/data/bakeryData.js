@@ -47,7 +47,7 @@ export const bakeryInfo = {
     facebookName: "Jas 'N Joy Cakes and Pastries (@jasnjoy.rxs)",
     facebookHandle: "@jasnjoy.rxs",
     facebookUrl: "https://www.facebook.com/jasnjoy.rxs/",
-    googleMapsUrl: "https://maps.google.com/?q=Roxas+City+Integrated+Transport+Terminal,+Pueblo+de+Panay,+Lawaan,+Roxas+City,+Capiz"
+    googleMapsUrl: "https://www.google.com/maps/place/Jas+'N+Joy+Cakes+and+pastries+shop/@11.5597978,122.7504225,19z/data=!3m1!4b1!4m6!3m5!1s0x33a5f3e5e80d1d8f:0x93f9b8e54a1b246c!8m2!3d11.5597965!4d122.7510662!16s%2Fg%2F11rz4xnnb2"
   },
 
   announcement: {

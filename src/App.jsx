@@ -1209,8 +1209,8 @@ export default function App() {
               <div className="bg-white rounded-3xl border border-[#E9D9C9] p-3 sm:p-4 shadow-xs">
                 <div className="relative aspect-[4/3] w-full rounded-2xl overflow-hidden border border-[#D9C4B2] bg-[#FAF2E8] shadow-inner">
                   <iframe
-                    title="Jas 'N Joy Location at Pueblo de Panay, Roxas City"
-                    src="https://maps.google.com/maps?q=Roxas+City+Integrated+Transport+Terminal,+Punta+Dulog,+Lawaan,+Pueblo+de+Panay,+Roxas+City,+Capiz&t=&z=16&ie=UTF8&iwloc=&output=embed"
+                    title="Jas 'N Joy Cakes and Pastries Shop Location at Pueblo de Panay"
+                    src="https://maps.google.com/maps?q=11.5597965,122.7510662+(Jas+'N+Joy+Cakes+and+pastries+shop)&t=&z=19&ie=UTF8&iwloc=B&output=embed"
                     className="w-full h-full border-0"
                     loading="lazy"
                     allowFullScreen
