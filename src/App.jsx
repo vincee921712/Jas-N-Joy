@@ -228,25 +228,25 @@ export default function App() {
             <button
               type="button"
               onClick={() => setIsLogoZoomed(true)}
-              className="relative group focus:outline-none focus:ring-2 focus:ring-[#92400E] rounded-2xl cursor-zoom-in"
+              className="relative group focus:outline-none focus:ring-2 focus:ring-[#92400E] rounded-full cursor-zoom-in"
               title="Click to view Jas 'N Joy Logo"
               aria-label="Zoom Jas 'N Joy Logo"
             >
-              <div className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl overflow-hidden bg-white border border-[#E9D9C9] p-0.5 shadow-xs group-hover:scale-105 group-hover:border-[#92400E] transition-all">
+              <div className="w-13 h-13 sm:w-14 sm:h-14 rounded-full overflow-hidden bg-white border border-[#E9D9C9] p-0.5 shadow-xs group-hover:scale-105 group-hover:border-[#92400E] transition-all">
                 <img 
                   src={bakeryInfo.logoUrl} 
                   alt="Jas 'N Joy Cakes and Pastries Official Logo" 
-                  className="w-full h-full object-contain rounded-xl"
+                  className="w-full h-full object-cover rounded-full"
                   onError={(e) => {
                     e.currentTarget.style.display = 'none';
                     e.currentTarget.nextElementSibling?.classList.remove('hidden');
                   }}
                 />
-                <div className="hidden w-full h-full flex items-center justify-center bg-[#FDF6ED]">
+                <div className="hidden w-full h-full flex items-center justify-center bg-[#FDF6ED] rounded-full">
                   <Cake className="w-6 h-6 text-[#92400E]" />
                 </div>
               </div>
-              <span className="absolute -bottom-1 -right-1 bg-[#92400E] text-white p-1 rounded-full text-[9px] opacity-0 group-hover:opacity-100 transition-opacity shadow-xs">
+              <span className="absolute -bottom-0.5 -right-0.5 bg-[#92400E] text-white p-1 rounded-full text-[9px] opacity-0 group-hover:opacity-100 transition-opacity shadow-xs">
                 🔍
               </span>
             </button>
@@ -1161,13 +1161,13 @@ export default function App() {
                 <button 
                   type="button" 
                   onClick={() => setIsLogoZoomed(true)} 
-                  className="w-10 h-10 rounded-xl overflow-hidden bg-white border border-amber-800 p-0.5 hover:scale-105 transition-transform cursor-zoom-in"
+                  className="w-10 h-10 rounded-full overflow-hidden bg-white border border-amber-800 p-0.5 hover:scale-105 transition-transform cursor-zoom-in"
                   title="Click to zoom logo"
                 >
                   <img 
                     src={bakeryInfo.logoUrl} 
                     alt="Jas 'N Joy Logo" 
-                    className="w-full h-full object-contain rounded-lg"
+                    className="w-full h-full object-cover rounded-full"
                   />
                 </button>
                 <span className="font-serif text-lg font-bold text-amber-100">
@@ -1258,11 +1258,11 @@ export default function App() {
             </button>
 
             {/* Zoomed Image */}
-            <div className="w-full aspect-square max-w-xs sm:max-w-sm mx-auto rounded-2xl overflow-hidden bg-white border border-[#E9D9C9] p-2 shadow-inner">
+            <div className="w-full aspect-square max-w-xs sm:max-w-sm mx-auto rounded-full overflow-hidden bg-white border-2 border-[#E9D9C9] p-1 shadow-inner">
               <img 
                 src={bakeryInfo.logoUrl} 
                 alt="Jas 'N Joy Cakes and Pastries Logo" 
-                className="w-full h-full object-contain"
+                className="w-full h-full object-cover rounded-full"
               />
             </div>
 

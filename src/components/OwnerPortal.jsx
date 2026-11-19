@@ -301,11 +301,11 @@ export default function OwnerPortal({
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
           
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-xl overflow-hidden bg-[#FAF2E8] border border-[#E9D9C9] p-0.5">
+            <div className="w-11 h-11 rounded-full overflow-hidden bg-[#FAF2E8] border border-[#E9D9C9] p-0.5">
               <img 
                 src={bakeryInfo.logoUrl} 
                 alt="Jas N Joy Logo" 
-                className="w-full h-full object-contain"
+                className="w-full h-full object-cover rounded-full"
               />
             </div>
             <div>

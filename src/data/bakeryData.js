@@ -23,7 +23,7 @@
 export const bakeryInfo = {
   brandName: "Jas 'N Joy Cakes and Pastries",
   tagline: "Affordable yet swak sa panlasa",
-  logoUrl: "/Jas N Joy Logo.jpg",
+  logoUrl: "/jas-n-joy-logo-circle.png",
   owner: "Razel C. Funa",
   ownerEmail: "razelcfuna@gmail.com",
   established: 2019,
