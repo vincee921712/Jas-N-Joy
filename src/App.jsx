@@ -23,7 +23,8 @@ import {
   Send,
   Store,
   Compass,
-  Lock
+  Lock,
+  ExternalLink
 } from 'lucide-react';
 import { 
   bakeryInfo, 
@@ -1142,6 +1143,15 @@ export default function App() {
                   <div>
                     <strong className="block text-[#451A03]">Storefront Address:</strong>
                     <span>{bakeryInfo.contact.address}</span>
+                    <a
+                      href={bakeryInfo.contact.googleMapsUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 text-xs text-[#92400E] hover:text-[#78350F] font-bold underline mt-1 transition-colors"
+                    >
+                      <MapPin className="w-3.5 h-3.5" />
+                      <span>Open in Google Maps (Get Directions)</span>
+                    </a>
                   </div>
                 </div>
 
@@ -1171,33 +1181,49 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Facebook Button */}
-              <div className="pt-2 border-t border-[#F5EBE1]">
+              {/* Action Buttons: Facebook & Google Maps */}
+              <div className="pt-2 border-t border-[#F5EBE1] flex flex-col sm:flex-row gap-3">
                 <a 
                   href={bakeryInfo.contact.facebookUrl}
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-[#92400E] hover:bg-[#78350F] text-white font-bold text-xs sm:text-sm shadow-xs transition-all"
+                  className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-[#92400E] hover:bg-[#78350F] text-white font-bold text-xs sm:text-sm shadow-xs transition-all"
                 >
                   <MessageCircle className="w-4 h-4 text-amber-300" />
                   <span>Message Us on Facebook</span>
                 </a>
+                <a 
+                  href={bakeryInfo.contact.googleMapsUrl}
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-[#FAF2E8] hover:bg-[#F3E5D4] border border-[#D9C4B2] text-[#451A03] font-bold text-xs sm:text-sm transition-all"
+                >
+                  <MapPin className="w-4 h-4 text-[#92400E]" />
+                  <span>View on Google Maps</span>
+                </a>
               </div>
             </div>
 
-            {/* Map & Storefront Photo Placeholder Frame */}
+            {/* Interactive Google Map & Storefront Frame */}
             <div className="lg:col-span-6 space-y-4">
-              <div className="bg-white rounded-3xl border border-[#E9D9C9] p-4 shadow-xs">
-                <div className="aspect-[4/3] w-full rounded-2xl bg-[#FFFDF9] border-2 border-dashed border-[#D9C4B2] flex flex-col items-center justify-center p-6 text-center">
-                  <div className="w-14 h-14 rounded-2xl bg-[#FAF2E8] flex items-center justify-center text-[#92400E] mb-3">
-                    <Compass className="w-7 h-7" />
-                  </div>
-                  <span className="font-mono text-xs font-bold text-[#78350F] bg-[#FEF3C7] px-3.5 py-1.5 rounded-md border border-[#FDE68A] mb-2">
-                    [Photo / Map Placeholder: Terminal Storefront & Pueblo de Panay Map]
-                  </span>
-                  <p className="text-xs text-[#786C62] max-w-sm leading-relaxed">
-                    Designed for embedding an interactive Google Map or a high-definition storefront facade photo at Roxas City Integrated Transport Terminal.
-                  </p>
+              <div className="bg-white rounded-3xl border border-[#E9D9C9] p-3 sm:p-4 shadow-xs">
+                <div className="relative aspect-[4/3] w-full rounded-2xl overflow-hidden border border-[#D9C4B2] bg-[#FAF2E8] shadow-inner">
+                  <iframe
+                    title="Jas 'N Joy Location at Pueblo de Panay, Roxas City"
+                    src="https://maps.google.com/maps?q=Roxas+City+Integrated+Transport+Terminal,+Punta+Dulog,+Lawaan,+Pueblo+de+Panay,+Roxas+City,+Capiz&t=&z=16&ie=UTF8&iwloc=&output=embed"
+                    className="w-full h-full border-0"
+                    loading="lazy"
+                    allowFullScreen
+                  />
+                  <a
+                    href={bakeryInfo.contact.googleMapsUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="absolute bottom-3 right-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/95 hover:bg-white text-[#92400E] text-xs font-bold shadow-md border border-[#D9C4B2] backdrop-blur-xs transition-all hover:scale-102"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5" />
+                    <span>Open in Google Maps</span>
+                  </a>
                 </div>
               </div>
 

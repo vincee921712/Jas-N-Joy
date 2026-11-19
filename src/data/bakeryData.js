@@ -46,7 +46,8 @@ export const bakeryInfo = {
     email: "razelcfuna@gmail.com",
     facebookName: "Jas 'N Joy Cakes and Pastries (@jasnjoy.rxs)",
     facebookHandle: "@jasnjoy.rxs",
-    facebookUrl: "https://www.facebook.com/jasnjoy.rxs/"
+    facebookUrl: "https://www.facebook.com/jasnjoy.rxs/",
+    googleMapsUrl: "https://maps.google.com/?q=Roxas+City+Integrated+Transport+Terminal,+Pueblo+de+Panay,+Lawaan,+Roxas+City,+Capiz"
   },
 
   announcement: {
