@@ -61,7 +61,8 @@ export const bakeryInfo = {
     placeholderText: "[Hero Photo Placeholder: Storefront or Signature Cake Showcase]",
     description: "Reserved for high-resolution photography of Jas 'N Joy's Pueblo de Panay bakeshop display or featured tiered centerpiece.",
     imageUrl: "",
-    imagePosition: "center"
+    imagePosition: "center",
+    imageScale: 1
   }
 };
 
