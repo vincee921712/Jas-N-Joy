@@ -147,6 +147,7 @@ export const products = [
     badge: "Ready in Display",
     availability: "Daily Walk-in / Ready-to-Go",
     photoPlaceholder: "[Photo Placeholder: Golden Caramel Chiffon Display Cake]",
+    imageUrl: "/cake-caramel-chiffon.jpg",
     accent: "bg-orange-100 text-orange-900 border-orange-300"
   },
   {
@@ -158,6 +159,7 @@ export const products = [
     badge: "Ready in Display",
     availability: "Daily Walk-in / Ready-to-Go",
     photoPlaceholder: "[Photo Placeholder: Ube Pastry Display Cake]",
+    imageUrl: "/cake-ube-pastry.jpg",
     accent: "bg-purple-100 text-purple-900 border-purple-300"
   },
 
@@ -171,6 +173,7 @@ export const products = [
     badge: "Past Featured Theme",
     availability: "3–5 Days Advance Order",
     photoPlaceholder: "[Photo Placeholder: Hello Kitty Candyland Cake]",
+    imageUrl: "/cake-pink-candyland.jpg",
     accent: "bg-pink-100 text-pink-900 border-pink-300"
   },
   {
@@ -182,6 +185,7 @@ export const products = [
     badge: "Past Featured Theme",
     availability: "3–5 Days Advance Order",
     photoPlaceholder: "[Photo Placeholder: Luxury Designer Bag Cake]",
+    imageUrl: "/wedding-pearl-cake.png",
     accent: "bg-rose-100 text-rose-900 border-rose-300"
   },
   {
@@ -193,6 +197,7 @@ export const products = [
     badge: "Past Featured Theme",
     availability: "3–5 Days Advance Order",
     photoPlaceholder: "[Photo Placeholder: Princess Doll Cake]",
+    imageUrl: "/cake-pink-candyland.jpg",
     accent: "bg-indigo-100 text-indigo-900 border-indigo-300"
   },
   {
@@ -204,6 +209,7 @@ export const products = [
     badge: "Past Featured Theme",
     availability: "3–5 Days Advance Order",
     photoPlaceholder: "[Photo Placeholder: Fresh Fruit Medley Cake]",
+    imageUrl: "/cake-fruit-medley.jpg",
     accent: "bg-emerald-100 text-emerald-900 border-emerald-300"
   },
   {
@@ -215,6 +221,7 @@ export const products = [
     badge: "Custom Arrangements",
     availability: "2–3 Days Advance Order",
     photoPlaceholder: "[Photo Placeholder: Number & Pull-Out Cupcake Set]",
+    imageUrl: "/pastry-cupcakes-platter.jpg",
     accent: "bg-amber-100 text-amber-900 border-amber-300"
   },
 
@@ -228,6 +235,7 @@ export const products = [
     badge: "Community Favorite",
     availability: "Available Daily at Pueblo de Panay",
     photoPlaceholder: "[Photo Placeholder: Mini Crinkles in a Tub]",
+    imageUrl: "/pastry-mini-crinkles.jpg",
     accent: "bg-stone-200 text-stone-900 border-stone-300"
   },
   {
@@ -239,6 +247,7 @@ export const products = [
     badge: "₱59 Snack Promo",
     availability: "Fresh Daily Batches",
     photoPlaceholder: "[Photo Placeholder: Box of Bite-Sized Donuts (₱59 Promo)]",
+    imageUrl: "/pastry-donuts-box.jpg",
     accent: "bg-orange-100 text-orange-950 border-orange-300"
   }
 ];
