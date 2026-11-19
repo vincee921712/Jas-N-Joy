@@ -26,9 +26,11 @@ import {
   ShieldCheck,
   ZoomIn,
   ZoomOut,
-  Move
+  Move,
+  Crop
 } from 'lucide-react';
 import { bakeryInfo, categories } from '../data/bakeryData';
+import GalleryPhotoCropper from './GalleryPhotoCropper';
 
 export default function OwnerPortal({ 
   onBackToStorefront,
@@ -87,6 +89,14 @@ export default function OwnerPortal({
   const [slotText, setSlotText] = useState(announcement.text);
   const [slotStatus, setSlotStatus] = useState(announcement.status || 'open'); // 'open' | 'limited' | 'full'
   const [slotSaveNotice, setSlotSaveNotice] = useState(false);
+
+  // Gallery Cropper Modal state
+  const [cropperModal, setCropperModal] = useState({
+    isOpen: false,
+    imageUrl: '',
+    target: '', // 'showcase' | 'product'
+    title: ''
+  });
 
   // Filter for Portal Catalog list
   const [portalCategoryFilter, setPortalCategoryFilter] = useState('all');
@@ -193,8 +203,18 @@ export default function OwnerPortal({
   const handleImageFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      const url = URL.createObjectURL(file);
-      setProductForm(prev => ({ ...prev, imageUrl: url }));
+      const reader = new FileReader();
+      reader.onload = (uploadEvent) => {
+        const rawUrl = uploadEvent.target.result;
+        // Open Gallery Crop Tool directly so user crops their full picture like mobile gallery
+        setCropperModal({
+          isOpen: true,
+          imageUrl: rawUrl,
+          target: 'product',
+          title: `Crop Photo: ${productForm.name || 'Catalog Product'}`
+        });
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -498,12 +518,7 @@ export default function OwnerPortal({
                         <img 
                           src={prod.imageUrl} 
                           alt={prod.name} 
-                          style={{ 
-                            objectPosition: prod.imagePosition || 'center',
-                            transform: `translate(${prod.imageX || 0}%, ${prod.imageY || 0}%) scale(${prod.imageScale || 1})`,
-                            transformOrigin: 'center center'
-                          }}
-                          className="w-full h-full object-cover rounded-xl transition-all"
+                          className="w-full h-full object-cover rounded-xl"
                         />
                       ) : (
                         <div className="text-center p-4">
@@ -748,8 +763,17 @@ export default function OwnerPortal({
                         onChange={(e) => {
                           const file = e.target.files[0];
                           if (file) {
-                            const url = URL.createObjectURL(file);
-                            setShowcaseForm({ ...showcaseForm, imageUrl: url });
+                            const reader = new FileReader();
+                            reader.onload = (uploadEvent) => {
+                              setCropperModal({
+                                isOpen: true,
+                                imageUrl: uploadEvent.target.result,
+                                rawOriginalUrl: uploadEvent.target.result,
+                                target: 'showcase',
+                                title: 'Crop Signature Cake Showcase Photo'
+                              });
+                            };
+                            reader.readAsDataURL(file);
                           }
                         }} 
                         className="hidden" 
@@ -763,126 +787,39 @@ export default function OwnerPortal({
                             <img 
                               src={showcaseForm.imageUrl} 
                               alt="Hero preview" 
-                              style={{ 
-                                transform: `translate(${showcaseForm.imageX || 0}%, ${showcaseForm.imageY || 0}%) scale(${showcaseForm.imageScale || 1})`,
-                                transformOrigin: 'center center'
-                              }}
-                              className="w-full h-full object-cover transition-transform" 
+                              className="w-full h-full object-cover" 
                             />
                           </div>
-                          <button
-                            type="button"
-                            onClick={() => setShowcaseForm({ ...showcaseForm, imageUrl: "" })}
-                            className="text-xs text-rose-700 hover:underline font-semibold"
-                          >
-                            Remove Photo
-                          </button>
+                          <div className="flex flex-col gap-1">
+                            <button
+                              type="button"
+                              onClick={() => setCropperModal({
+                                isOpen: true,
+                                imageUrl: showcaseForm.rawOriginalUrl || showcaseForm.imageUrl,
+                                rawOriginalUrl: showcaseForm.rawOriginalUrl || showcaseForm.imageUrl,
+                                target: 'showcase',
+                                title: 'Re-crop Showcase Photo'
+                              })}
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#FAF2E8] hover:bg-[#F3E5D4] border border-[#D9C4B2] text-xs text-[#92400E] font-bold transition-colors"
+                            >
+                              <Crop className="w-3.5 h-3.5" />
+                              <span>Crop & Adjust Frame</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setShowcaseForm({ ...showcaseForm, imageUrl: "", rawOriginalUrl: "" })}
+                              className="text-[11px] text-rose-700 hover:underline font-semibold text-left"
+                            >
+                              Remove Photo
+                            </button>
+                          </div>
                         </div>
 
-                        {/* Interactive Photo Zoom & Placement Controls */}
-                        <div className="flex-1 bg-white p-3 rounded-xl border border-[#D9C4B2] w-full space-y-2.5">
-                          <div>
-                            <div className="flex items-center justify-between mb-1.5">
-                              <span className="text-[11px] font-bold text-[#451A03] flex items-center gap-1.5">
-                                <ZoomIn className="w-3.5 h-3.5 text-[#92400E]" />
-                                Photo Zoom Scale:
-                              </span>
-                              <span className="text-[11px] font-mono font-bold text-[#92400E] bg-[#FAF2E8] px-2 py-0.5 rounded border border-[#E9D9C9]">
-                                {Math.round((showcaseForm.imageScale || 1) * 100)}%
-                              </span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <button
-                                type="button"
-                                title="Zoom out"
-                                onClick={() => setShowcaseForm(prev => ({ 
-                                  ...prev, 
-                                  imageScale: Math.max(1, Math.round(((prev.imageScale || 1) - 0.1) * 100) / 100)
-                                }))}
-                                className="w-7 h-7 rounded-lg border border-[#D9C4B2] bg-[#FFFDF9] hover:bg-[#FAF2E8] flex items-center justify-center text-[#57483D] font-bold text-xs transition-colors shrink-0"
-                              >
-                                <ZoomOut className="w-3.5 h-3.5" />
-                              </button>
-                              <input
-                                type="range"
-                                min="1"
-                                max="2.5"
-                                step="0.05"
-                                value={showcaseForm.imageScale || 1}
-                                onChange={(e) => setShowcaseForm(prev => ({ ...prev, imageScale: parseFloat(e.target.value) }))}
-                                className="w-full accent-[#92400E] cursor-pointer"
-                              />
-                              <button
-                                type="button"
-                                title="Zoom in"
-                                onClick={() => setShowcaseForm(prev => ({ 
-                                  ...prev, 
-                                  imageScale: Math.min(2.5, Math.round(((prev.imageScale || 1) + 0.1) * 100) / 100)
-                                }))}
-                                className="w-7 h-7 rounded-lg border border-[#D9C4B2] bg-[#FFFDF9] hover:bg-[#FAF2E8] flex items-center justify-center text-[#57483D] font-bold text-xs transition-colors shrink-0"
-                              >
-                                <ZoomIn className="w-3.5 h-3.5" />
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => setShowcaseForm(prev => ({ ...prev, imageScale: 1, imageX: 0, imageY: 0 }))}
-                                className="text-[10px] text-stone-500 hover:text-stone-800 underline font-medium ml-1 shrink-0"
-                              >
-                                Reset All
-                              </button>
-                            </div>
-                          </div>
-
-                          {/* Pan / Placement Alignment Controls (Active when zoomed or to frame) */}
-                          <div className="pt-2 border-t border-[#F5EBE1]">
-                            <div className="flex items-center justify-between mb-1.5">
-                              <span className="text-[11px] font-bold text-[#451A03] flex items-center gap-1.5">
-                                <Move className="w-3.5 h-3.5 text-[#92400E]" />
-                                Adjust Position (Pan / Placement):
-                              </span>
-                              {(showcaseForm.imageX !== 0 || showcaseForm.imageY !== 0) && (
-                                <button
-                                  type="button"
-                                  onClick={() => setShowcaseForm(prev => ({ ...prev, imageX: 0, imageY: 0 }))}
-                                  className="text-[10px] text-stone-500 hover:text-stone-800 underline font-medium"
-                                >
-                                  Center Position
-                                </button>
-                              )}
-                            </div>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[10px]">
-                              <div>
-                                <div className="flex justify-between text-[#786C62] mb-0.5 font-medium">
-                                  <span>Horizontal (Left / Right):</span>
-                                  <span className="font-mono">{showcaseForm.imageX || 0}%</span>
-                                </div>
-                                <input
-                                  type="range"
-                                  min="-40"
-                                  max="40"
-                                  step="2"
-                                  value={showcaseForm.imageX || 0}
-                                  onChange={(e) => setShowcaseForm(prev => ({ ...prev, imageX: parseInt(e.target.value, 10) }))}
-                                  className="w-full accent-[#92400E] cursor-pointer"
-                                />
-                              </div>
-                              <div>
-                                <div className="flex justify-between text-[#786C62] mb-0.5 font-medium">
-                                  <span>Vertical (Up / Down):</span>
-                                  <span className="font-mono">{showcaseForm.imageY || 0}%</span>
-                                </div>
-                                <input
-                                  type="range"
-                                  min="-40"
-                                  max="40"
-                                  step="2"
-                                  value={showcaseForm.imageY || 0}
-                                  onChange={(e) => setShowcaseForm(prev => ({ ...prev, imageY: parseInt(e.target.value, 10) }))}
-                                  className="w-full accent-[#92400E] cursor-pointer"
-                                />
-                              </div>
-                            </div>
-                          </div>
+                        <div className="flex-1 bg-white p-3 rounded-xl border border-[#D9C4B2] w-full text-xs text-[#57483D]">
+                          <span className="font-bold text-[#451A03] block mb-1">Gallery Photo Crop Applied</span>
+                          <p className="text-[11px] text-[#786C62]">
+                            Your photo was framed with the interactive crop tool and will display cleanly across the storefront. Click <strong>"Crop & Adjust Frame"</strong> anytime to reposition or re-zoom the full original image.
+                          </p>
                         </div>
                       </div>
                     ) : (
@@ -904,10 +841,6 @@ export default function OwnerPortal({
                         <img 
                           src={showcaseForm.imageUrl} 
                           alt="preview" 
-                          style={{ 
-                            transform: `translate(${showcaseForm.imageX || 0}%, ${showcaseForm.imageY || 0}%) scale(${showcaseForm.imageScale || 1})`,
-                            transformOrigin: 'center center'
-                          }}
                           className="w-full h-full object-cover rounded-xl transition-all" 
                         />
                       ) : (
@@ -1289,132 +1222,45 @@ export default function OwnerPortal({
                   </label>
 
                   {productForm.imageUrl && (
-                    <div className="flex flex-col gap-2 w-full pt-1">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full pt-1">
                       <div className="flex items-center gap-2">
-                        <div className="w-12 h-12 rounded-lg overflow-hidden border border-[#D9C4B2] shrink-0 relative bg-white">
+                        <div className="w-14 h-14 rounded-xl overflow-hidden border border-[#D9C4B2] shrink-0 relative bg-white shadow-2xs">
                           <img 
                             src={productForm.imageUrl} 
                             alt="preview" 
-                            style={{ 
-                              transform: `translate(${productForm.imageX || 0}%, ${productForm.imageY || 0}%) scale(${productForm.imageScale || 1})`,
-                              transformOrigin: 'center center'
-                            }}
-                            className="w-full h-full object-cover transition-transform" 
+                            className="w-full h-full object-cover" 
                           />
                         </div>
-                        <button 
-                          type="button" 
-                          onClick={() => setProductForm({ ...productForm, imageUrl: '' })}
-                          className="text-[11px] text-rose-700 hover:underline font-semibold"
-                        >
-                          Remove Photo
-                        </button>
+                        <div className="flex flex-col gap-1">
+                          <button
+                            type="button"
+                            onClick={() => setCropperModal({
+                              isOpen: true,
+                              imageUrl: productForm.rawOriginalUrl || productForm.imageUrl,
+                              rawOriginalUrl: productForm.rawOriginalUrl || productForm.imageUrl,
+                              target: 'product',
+                              title: `Crop Photo: ${productForm.name || 'Catalog Product'}`
+                            })}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white hover:bg-[#F3E5D4] border border-[#D9C4B2] text-xs text-[#92400E] font-bold transition-colors shadow-2xs"
+                          >
+                            <Crop className="w-3.5 h-3.5" />
+                            <span>Crop Photo</span>
+                          </button>
+                          <button 
+                            type="button" 
+                            onClick={() => setProductForm({ ...productForm, imageUrl: '', rawOriginalUrl: '' })}
+                            className="text-[11px] text-rose-700 hover:underline font-semibold text-left"
+                          >
+                            Remove Photo
+                          </button>
+                        </div>
                       </div>
 
-                      {/* Photo Crop / Zoom & Placement Scale Controls for Catalog Product */}
-                      <div className="bg-white p-2.5 rounded-xl border border-[#D9C4B2] space-y-2">
-                        <div>
-                          <div className="flex items-center justify-between mb-1">
-                            <span className="text-[11px] font-bold text-[#451A03] flex items-center gap-1">
-                              <ZoomIn className="w-3 h-3 text-[#92400E]" />
-                              Photo Zoom Scale:
-                            </span>
-                            <span className="text-[10px] font-mono font-bold text-[#92400E] bg-[#FAF2E8] px-1.5 py-0.5 rounded border border-[#E9D9C9]">
-                              {Math.round((productForm.imageScale || 1) * 100)}%
-                            </span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <button
-                              type="button"
-                              title="Zoom out"
-                              onClick={() => setProductForm(prev => ({ 
-                                ...prev, 
-                                imageScale: Math.max(1, Math.round(((prev.imageScale || 1) - 0.1) * 100) / 100)
-                              }))}
-                              className="w-6 h-6 rounded-lg border border-[#D9C4B2] bg-[#FFFDF9] hover:bg-[#FAF2E8] flex items-center justify-center text-[#57483D] font-bold text-xs transition-colors shrink-0"
-                            >
-                              <ZoomOut className="w-3 h-3" />
-                            </button>
-                            <input
-                              type="range"
-                              min="1"
-                              max="2.5"
-                              step="0.05"
-                              value={productForm.imageScale || 1}
-                              onChange={(e) => setProductForm(prev => ({ ...prev, imageScale: parseFloat(e.target.value) }))}
-                              className="w-full accent-[#92400E] cursor-pointer"
-                            />
-                            <button
-                              type="button"
-                              title="Zoom in"
-                              onClick={() => setProductForm(prev => ({ 
-                                ...prev, 
-                                imageScale: Math.min(2.5, Math.round(((prev.imageScale || 1) + 0.1) * 100) / 100)
-                              }))}
-                              className="w-6 h-6 rounded-lg border border-[#D9C4B2] bg-[#FFFDF9] hover:bg-[#FAF2E8] flex items-center justify-center text-[#57483D] font-bold text-xs transition-colors shrink-0"
-                            >
-                              <ZoomIn className="w-3 h-3" />
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => setProductForm(prev => ({ ...prev, imageScale: 1, imageX: 0, imageY: 0 }))}
-                              className="text-[10px] text-stone-500 hover:text-stone-800 underline font-medium ml-1 shrink-0"
-                            >
-                              Reset
-                            </button>
-                          </div>
-                        </div>
-
-                        {/* Position Adjustment Sliders */}
-                        <div className="pt-2 border-t border-[#F5EBE1]">
-                          <div className="flex items-center justify-between mb-1">
-                            <span className="text-[10px] font-bold text-[#451A03] flex items-center gap-1">
-                              <Move className="w-3 h-3 text-[#92400E]" />
-                              Adjust Placement (Pan):
-                            </span>
-                            {(productForm.imageX !== 0 || productForm.imageY !== 0) && (
-                              <button
-                                type="button"
-                                onClick={() => setProductForm(prev => ({ ...prev, imageX: 0, imageY: 0 }))}
-                                className="text-[9px] text-stone-500 hover:text-stone-800 underline font-medium"
-                              >
-                                Center
-                              </button>
-                            )}
-                          </div>
-                          <div className="grid grid-cols-2 gap-2 text-[9px]">
-                            <div>
-                              <div className="flex justify-between text-[#786C62] mb-0.5">
-                                <span>Left / Right:</span>
-                                <span className="font-mono">{productForm.imageX || 0}%</span>
-                              </div>
-                              <input
-                                type="range"
-                                min="-40"
-                                max="40"
-                                step="2"
-                                value={productForm.imageX || 0}
-                                onChange={(e) => setProductForm(prev => ({ ...prev, imageX: parseInt(e.target.value, 10) }))}
-                                className="w-full accent-[#92400E] cursor-pointer"
-                              />
-                            </div>
-                            <div>
-                              <div className="flex justify-between text-[#786C62] mb-0.5">
-                                <span>Up / Down:</span>
-                                <span className="font-mono">{productForm.imageY || 0}%</span>
-                              </div>
-                              <input
-                                type="range"
-                                min="-40"
-                                max="40"
-                                step="2"
-                                value={productForm.imageY || 0}
-                                onChange={(e) => setProductForm(prev => ({ ...prev, imageY: parseInt(e.target.value, 10) }))}
-                                className="w-full accent-[#92400E] cursor-pointer"
-                              />
-                            </div>
-                          </div>
-                        </div>
+                      <div className="flex-1 bg-white p-2.5 rounded-xl border border-[#D9C4B2] text-xs text-[#57483D]">
+                        <span className="font-bold text-[#451A03] block text-[11px]">Photo Cropped for Storefront</span>
+                        <p className="text-[10px] text-[#786C62]">
+                          Uses gallery-style crop box matching the catalog card aspect ratio. Click <strong>"Crop Photo"</strong> to re-adjust framing anytime.
+                        </p>
                       </div>
                     </div>
                   )}
@@ -1463,6 +1309,32 @@ export default function OwnerPortal({
 
           </div>
         </div>
+      )}
+
+      {/* Gallery Photo Cropper Modal */}
+      {cropperModal.isOpen && (
+        <GalleryPhotoCropper 
+          imageUrl={cropperModal.imageUrl}
+          title={cropperModal.title || "Crop & Frame Photo"}
+          aspectRatio={cropperModal.target === 'showcase' ? 4 / 5 : 4 / 5}
+          onSaveCroppedImage={(croppedDataUrl) => {
+            if (cropperModal.target === 'showcase') {
+              setShowcaseForm(prev => ({ 
+                ...prev, 
+                imageUrl: croppedDataUrl,
+                rawOriginalUrl: cropperModal.rawOriginalUrl || prev.rawOriginalUrl || cropperModal.imageUrl
+              }));
+            } else if (cropperModal.target === 'product') {
+              setProductForm(prev => ({ 
+                ...prev, 
+                imageUrl: croppedDataUrl,
+                rawOriginalUrl: cropperModal.rawOriginalUrl || prev.rawOriginalUrl || cropperModal.imageUrl
+              }));
+            }
+            setCropperModal({ isOpen: false, imageUrl: '', rawOriginalUrl: '', target: '', title: '' });
+          }}
+          onClose={() => setCropperModal({ isOpen: false, imageUrl: '', rawOriginalUrl: '', target: '', title: '' })}
+        />
       )}
 
     </div>

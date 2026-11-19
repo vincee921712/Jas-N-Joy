@@ -510,7 +510,7 @@ export default function App() {
                       alt="Signature Cake Showcase" 
                       style={{ 
                         objectPosition: heroShowcase.imagePosition || 'center',
-                        transform: `translate(${heroShowcase.imageX || 0}%, ${heroShowcase.imageY || 0}%) scale(${heroShowcase.imageScale || 1})`,
+                        transform: heroShowcase.imageScale ? `translate(${heroShowcase.imageX || 0}%, ${heroShowcase.imageY || 0}%) scale(${heroShowcase.imageScale || 1})` : undefined,
                         transformOrigin: 'center center'
                       }}
                       className="w-full h-full object-cover rounded-xl transition-transform duration-500 group-hover:scale-105"
@@ -660,7 +660,7 @@ export default function App() {
                           alt={product.name} 
                           style={{ 
                             objectPosition: product.imagePosition || 'center',
-                            transform: `translate(${product.imageX || 0}%, ${product.imageY || 0}%) scale(${product.imageScale || 1})`,
+                            transform: product.imageScale ? `translate(${product.imageX || 0}%, ${product.imageY || 0}%) scale(${product.imageScale || 1})` : undefined,
                             transformOrigin: 'center center'
                           }}
                           className="w-full h-full object-cover rounded-xl transition-transform duration-500 ease-out group-hover:scale-105"
