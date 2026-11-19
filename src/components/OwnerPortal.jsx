@@ -383,7 +383,7 @@ export default function OwnerPortal({
                 </span>
               </div>
               <span className="text-xs text-[#786C62]">
-                Logged in as <strong>{bakeryInfo.ownerEmail}</strong>
+                Logged in as <strong>admin</strong>
               </span>
             </div>
           </div>
